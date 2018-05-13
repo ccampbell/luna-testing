@@ -1,0 +1,29 @@
+{
+  "name": "bomb",
+  "version": "1.0.0",
+  "description": "A simple, opinionated, batteries included unit testing framework",
+  "main": "src/bomb.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup src/bomb.js --o dist/bomb.js --f cjs --banner \"#!/usr/bin/env node\""
+  },
+  "keywords": [
+    "unit",
+    "test",
+    "tests",
+    "testing"
+  ],
+  "author": "Craig Campbell",
+  "license": "MIT",
+  "devDependencies": {
+    "express": "^4.16.3",
+    "magic-string": "^0.24.0",
+    "rollup": "^0.58.2",
+    "rollup-plugin-buble": "^0.19.2",
+    "rollup-plugin-jsx": "^1.0.3",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-virtual": "^1.0.1",
+    "yargs": "^11.0.0"
+  },
+  "dependencies": {}
+}
