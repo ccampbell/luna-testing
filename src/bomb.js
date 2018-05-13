@@ -20,7 +20,13 @@ if (argv._.length < 1 || !fs.existsSync(argv._[0])) {
 
 const options = {
     path : argv._[0],
-    parallel: argv.parallel
+    concurrency: argv.concurrency
 };
 
-runTests(options);
+(async () => {
+    try {
+        await runTests(options);
+    } catch(e) {
+        console.error('Error running tests', e);
+    }
+})()

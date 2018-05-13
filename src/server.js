@@ -3,6 +3,7 @@ const fs = require('fs');
 const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
+const istanbul = require('rollup-plugin-istanbul');
 
 async function bundleHandler(req, res) {
     const filePath = req.params[0];
@@ -21,6 +22,9 @@ async function bundleHandler(req, res) {
                 replace({
                     TEST_FILE_PATH: `${process.cwd()}/${filePath}`
                 }),
+                // istanbul({
+                //     exclude: [filePath]
+                // }),
                 buble({
                     target: {
                         chrome: 63
@@ -53,9 +57,9 @@ function runHandler(req, res) {
     res.status(200).send(`<!DOCTYPE html><head><title>${filePath} – Test Runner</title></head><body><script src="${bundlePath}"></script></body>`);
 }
 
-export function startServer() {
+export async function startServer() {
     const app = express();
     app.get(/\/bundle\/(.*)/, bundleHandler);
     app.get(/\/run\/(.*)/, runHandler);
-    app.listen(2662, () => console.log('Server started on port 2662…'));
+    return app.listen(2662, () => console.log('Server started on port 2662…'));
 }
