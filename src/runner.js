@@ -41,10 +41,12 @@ async function runTest(browser, testPath, options) {
             page.on('console', msg => {
                 if (options.verbose && /^Running/.test(msg._text)) {
                     console.log(`[${testPath}]`, msg._text);
+                    return;
                 }
 
                 if (/^Results/.test(msg._text)) {
                     results = JSON.parse(msg._text.slice(8));
+                    return;
                 }
             });
 
