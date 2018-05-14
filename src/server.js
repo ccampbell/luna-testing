@@ -3,7 +3,6 @@ const fs = require('fs');
 const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
-const istanbul = require('rollup-plugin-istanbul');
 import assert from './rollup-assert';
 
 async function getBundle(filePath) {
