@@ -12,6 +12,9 @@ function showUsage() {
         '   `9MMP\''].join('\n'));
     console.log('\n\x1B[1mUSAGE\x1B[0m');
     console.log('bomb /path/to/tests');
+    console.log('\n\x1B[1mARGUMENTS\x1B[0m');
+    console.log('--concurrency    number of test files to run at a time (default: 1)')
+    console.log('--verbose        show verbose output when tests run')
 }
 
 if (argv._.length < 1 || !fs.existsSync(argv._[0])) {
@@ -21,7 +24,8 @@ if (argv._.length < 1 || !fs.existsSync(argv._[0])) {
 
 const options = {
     path : argv._[0],
-    concurrency: argv.concurrency
+    concurrency: argv.concurrency || 1,
+    verbose: argv.verbose
 };
 
 (async () => {
