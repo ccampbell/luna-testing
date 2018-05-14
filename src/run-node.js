@@ -4,6 +4,6 @@ import Bomb from './classes/Bomb';
 module.exports = {
     run: async () => {
         const bomb = new Bomb();
-        await bomb.runAll(tests);
+        return bomb.runAll(tests);
     }
 };
