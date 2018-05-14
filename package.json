@@ -5,7 +5,7 @@
   "main": "src/bomb.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup src/bomb.js --o dist/bomb.js --f cjs --banner \"#!/usr/bin/env node\""
+    "build": "rollup src/bomb.js -e magic-string -o bin/bomb.js -f cjs --banner \"#!/usr/bin/env node\""
   },
   "keywords": [
     "unit",
