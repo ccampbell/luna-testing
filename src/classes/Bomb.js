@@ -40,17 +40,18 @@ export default class Bomb {
         });
     }
 
-    assert(condition, message) {
+    assert(assertion, message) {
         this.results[this.running].assertions += 1;
-        if (condition === false) {
-            this.fail(message);
+        if (assertion.value === false) {
+            this.fail(message, assertion);
         }
     }
 
-    fail(message) {
+    fail(message, extraData) {
         this.results[this.running].failures += 1;
         this.results[this.running].error = message || 'Assertion failed';
         this.results[this.running].trace = new Error(message).stack;
+        this.results[this.running].data = extraData;
     }
 
     async runAll(tests) {

@@ -4,6 +4,7 @@ const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const istanbul = require('rollup-plugin-istanbul');
+import assert from './rollup-assert';
 
 async function bundleHandler(req, res) {
     const filePath = req.params[0];
@@ -30,7 +31,8 @@ async function bundleHandler(req, res) {
                         chrome: 63
                     },
                     jsx: 'React.createElement'
-                })
+                }),
+                assert()
             ]
         });
 
