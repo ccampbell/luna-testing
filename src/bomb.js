@@ -15,6 +15,7 @@ function showUsage() {
     console.log('\n\x1B[1mARGUMENTS\x1B[0m');
     console.log('--concurrency    number of test files to run at a time (default: 1)')
     console.log('--verbose        show verbose output when tests run')
+    console.log('--node           run unit tests from node environment instead of a browser')
 }
 
 if (argv._.length < 1) {
