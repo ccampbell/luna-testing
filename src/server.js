@@ -6,6 +6,40 @@ const replace = require('rollup-plugin-replace');
 const istanbul = require('rollup-plugin-istanbul');
 import assert from './rollup-assert';
 
+async function getBundle(filePath) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const bundle = await rollup.rollup({
+                input: 'src/run.js',
+                treeshake: true, // for testing
+                plugins: [
+                    replace({
+                        TEST_FILE_PATH: `${process.cwd()}/${filePath}`
+                    }),
+                    buble({
+                        target: {
+                            chrome: 63
+                        },
+                        jsx: 'React.createElement'
+                    }),
+                    assert()
+                ]
+            });
+
+            let { code, map } = await bundle.generate({
+                format: 'iife',
+                freeze: true,
+                sourcemap: 'inline'
+            });
+
+            code += `\n//# sourceMappingURL=${map.toUrl()}\n`;
+            resolve(code);
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
 async function bundleHandler(req, res) {
     const filePath = req.params[0];
 
@@ -16,38 +50,11 @@ async function bundleHandler(req, res) {
     }
 
     try {
-        const bundle = await rollup.rollup({
-            input: 'src/run.js',
-            treeshake: true, // for testing
-            plugins: [
-                replace({
-                    TEST_FILE_PATH: `${process.cwd()}/${filePath}`
-                }),
-                // istanbul({
-                //     exclude: [filePath]
-                // }),
-                buble({
-                    target: {
-                        chrome: 63
-                    },
-                    jsx: 'React.createElement'
-                }),
-                assert()
-            ]
-        });
-
-        let { code, map } = await bundle.generate({
-            format: 'iife',
-            freeze: true,
-            sourcemap: 'inline'
-        });
-
-        code += `\n//# sourceMappingURL=${map.toUrl()}\n`;
-
+        const code = await getBundle(filePath);
         res.set('Content-Type', 'application/javascript');
         res.send(code);
-    } catch (e) {
-        console.log(e);
+    } catch(e) {
+        console.error(e);
         res.status(500).send(e);
         return;
     }
