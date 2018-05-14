@@ -50,6 +50,11 @@ async function runTest(browser, testPath, options) {
                 }
             });
 
+            page.on('pageerror', async (event) => {
+                await page.close();
+                reject(event);
+            });
+
             await page.goto(url, { timeout: 5000 });
             await page.waitForSelector('.done')
             await page.close();
@@ -88,7 +93,11 @@ export async function runTests(options) {
 
     q.on('taskend', (name, data) => {
         console.log('taskend', name, data);
-    })
+    });
+
+    q.on('taskerror', (name, data) => {
+        console.log('taskerror', name, data);
+    });
 
     q.on('complete', async () => {
         await browser.close();

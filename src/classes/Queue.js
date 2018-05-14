@@ -46,7 +46,7 @@ export default class Queue {
                 this._active.splice(index, 1);
                 this._run();
             }).catch((e) => {
-                this.fire('taskerror', toRun.name);
+                this.fire('taskerror', toRun.name, e);
                 this._run();
             })
         }
