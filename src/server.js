@@ -9,7 +9,7 @@ export async function getBundle(filePath, node=false) {
     return new Promise(async (resolve, reject) => {
         try {
             const bundle = await rollup.rollup({
-                input: node ? 'src/run-node.js': 'src/run.js',
+                input: node ? 'src/run-node.js': 'src/run-browser.js',
                 treeshake: true, // for testing
                 plugins: [
                     replace({
