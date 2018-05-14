@@ -1,4 +1,4 @@
-import { runTests } from './runner';
+import { runTests, singleRun } from './runner';
 const fs = require('fs');
 const argv = require('yargs').argv;
 const version = require('./../package.json').version;
@@ -36,14 +36,23 @@ if (paths.length === 0) {
 
 const options = {
     paths,
+    binary: argv.$0,
     concurrency: argv.concurrency || 1,
-    verbose: argv.verbose
+    verbose: argv.verbose,
+    node: argv.node,
+    singleRun: argv['single-run']
 };
 
 (async () => {
     try {
+        if (options.singleRun) {
+            await singleRun(options);
+            process.exit(0);
+            return;
+        }
         await runTests(options);
     } catch(e) {
         console.error('Error running tests', e);
+        process.exit(1);
     }
 })()

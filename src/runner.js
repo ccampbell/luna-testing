@@ -1,8 +1,9 @@
 // This is the runner that runs from node.js to execute the tests
-import { startServer } from './server';
+import { startServer, getBundle } from './server';
 import Queue from './classes/Queue';
 
 const fs = require('fs');
+const spawn = require('child_process').spawn;
 const puppeteer = require('puppeteer');
 const walk = require('walk');
 
@@ -32,22 +33,60 @@ async function getFilesToRun(path) {
     });
 }
 
-async function runTest(browser, testPath, options) {
+
+// This is called from the new node thread that is launched to run tests when
+// runing natively in node
+//
+// @see https://stackoverflow.com/questions/17581830/load-node-js-module-from-string-in-memory
+export async function singleRun(options) {
+    function requireFromString(src, filename) {
+        var Module = module.constructor;
+        var m = new Module();
+        m._compile(src, filename);
+        return m.exports;
+    }
+
+    const testPath = options.paths[0];
+    const code = await getBundle(testPath, true);
+    const tests = requireFromString(code, '');
+    return tests.run();
+}
+
+function handleMessage(message, testPath, options) {
+    if (options.verbose && /^Running/.test(message)) {
+        console.log(`[${testPath}]`, message);
+        return;
+    }
+
+    if (/^Results/.test(message)) {
+        return JSON.parse(message.slice(8));
+    }
+}
+
+async function runTestNode(testPath, options) {
+    return new Promise((resolve, reject) => {
+        // console.log('runTestNode', testPath, options);
+        var test = spawn(options.binary, [testPath, '--node', '--single-run']);
+
+        let results = {};
+        test.stdout.on('data', (output) => {
+            results = handleMessage(output.toString(), testPath, options);
+        });
+
+        test.on('close', () => {
+            resolve(results);
+        });
+    });
+}
+
+async function runTestBrowser(browser, testPath, options) {
     return new Promise(async (resolve, reject) => {
         try {
             const page = await browser.newPage();
             const url = `http://localhost:2662/run/${testPath}`
             let results = {};
             page.on('console', msg => {
-                if (options.verbose && /^Running/.test(msg._text)) {
-                    console.log(`[${testPath}]`, msg._text);
-                    return;
-                }
-
-                if (/^Results/.test(msg._text)) {
-                    results = JSON.parse(msg._text.slice(8));
-                    return;
-                }
+                results = handleMessage(msg._text, testPath, options);
             });
 
             page.on('pageerror', async (event) => {
@@ -66,9 +105,6 @@ async function runTest(browser, testPath, options) {
 }
 
 export async function runTests(options) {
-    const server = await startServer(options);
-    const browser = await puppeteer.launch();
-
     const q = new Queue({
         concurrency: options.concurrency
     });
@@ -79,8 +115,20 @@ export async function runTests(options) {
         files = files.concat(newFiles);
     }
 
+    let server;
+    let browser;
+    if (!options.node) {
+        server = await startServer(options);
+        browser = await puppeteer.launch();
+    }
+
     for (const filePath of files) {
-        q.addTask(runTest(browser, filePath, options), filePath);
+        if (options.node) {
+            q.addTask(runTestNode(filePath,options), filePath);
+            continue;
+        }
+
+        q.addTask(runTestBrowser(browser, filePath, options), filePath);
     }
 
     // q.on('start', () => {
@@ -100,8 +148,10 @@ export async function runTests(options) {
     });
 
     q.on('complete', async () => {
-        await browser.close();
-        await server.close();
+        if (!options.node) {
+            await browser.close();
+            await server.close();
+        }
         process.exit(0);
     });
 

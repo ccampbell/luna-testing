@@ -5,11 +5,11 @@ const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 import assert from './rollup-assert';
 
-async function getBundle(filePath) {
+export async function getBundle(filePath, node=false) {
     return new Promise(async (resolve, reject) => {
         try {
             const bundle = await rollup.rollup({
-                input: 'src/run.js',
+                input: node ? 'src/run-node.js': 'src/run.js',
                 treeshake: true, // for testing
                 plugins: [
                     replace({
@@ -26,7 +26,7 @@ async function getBundle(filePath) {
             });
 
             let { code, map } = await bundle.generate({
-                format: 'iife',
+                format: node ? 'cjs': 'iife',
                 freeze: true,
                 sourcemap: 'inline'
             });
