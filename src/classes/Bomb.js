@@ -55,6 +55,11 @@ export default class Bomb {
 
     async runAll(tests) {
         for (const testName in tests) {
+            // If the function name does not start with test then skip it
+            if (!/^test/.test(testName)) {
+                continue;
+            }
+
             try {
                 await this.run(testName, tests[testName]);
             } catch (e) {
