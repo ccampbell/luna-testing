@@ -66,7 +66,12 @@ export async function runTests(options) {
         concurrency: options.concurrency
     });
 
-    const files = await getFilesToRun(options.path)
+    let files = [];
+    for (const path of options.paths) {
+        const newFiles = await getFilesToRun(path);
+        files = files.concat(newFiles);
+    }
+
     for (const filePath of files) {
         q.addTask(runTest(browser, filePath, options), filePath);
     }

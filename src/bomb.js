@@ -17,13 +17,25 @@ function showUsage() {
     console.log('--verbose        show verbose output when tests run')
 }
 
-if (argv._.length < 1 || !fs.existsSync(argv._[0])) {
+if (argv._.length < 1) {
+    showUsage();
+    process.exit(1);
+}
+
+const paths = [];
+for (let i = 0; i < argv._.length; i++) {
+    if (fs.existsSync(argv._[i])) {
+        paths.push(argv._[i]);
+    }
+}
+
+if (paths.length === 0) {
     showUsage();
     process.exit(1);
 }
 
 const options = {
-    path : argv._[0],
+    paths,
     concurrency: argv.concurrency || 1,
     verbose: argv.verbose
 };
