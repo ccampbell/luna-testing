@@ -32,19 +32,26 @@ async function getFilesToRun(path) {
     });
 }
 
-async function runTest(browser, testPath) {
+async function runTest(browser, testPath, options) {
     return new Promise(async (resolve, reject) => {
         try {
             const page = await browser.newPage();
             const url = `http://localhost:2662/run/${testPath}`
+            let results = {};
             page.on('console', msg => {
-                console.log(msg._text);
+                if (options.verbose && /^Running/.test(msg._text)) {
+                    console.log(`[${testPath}]`, msg._text);
+                }
+
+                if (/^Results/.test(msg._text)) {
+                    results = JSON.parse(msg._text.slice(8));
+                }
             });
 
             await page.goto(url, { timeout: 5000 });
             await page.waitForSelector('.done')
             await page.close();
-            resolve();
+            resolve(results);
         } catch (e) {
             reject(e);
         }
@@ -52,7 +59,7 @@ async function runTest(browser, testPath) {
 }
 
 export async function runTests(options) {
-    const server = await startServer();
+    const server = await startServer(options);
     const browser = await puppeteer.launch();
 
     const q = new Queue({
@@ -61,7 +68,7 @@ export async function runTests(options) {
 
     const files = await getFilesToRun(options.path)
     for (const filePath of files) {
-        q.addTask(runTest(browser, filePath), filePath);
+        q.addTask(runTest(browser, filePath, options), filePath);
     }
 
     // q.on('start', () => {
@@ -72,9 +79,9 @@ export async function runTests(options) {
     //     console.log('taskstart', name);
     // })
 
-    // q.on('taskend', (name) => {
-    //     console.log('taskend', name);
-    // })
+    q.on('taskend', (name, data) => {
+        console.log('taskend', name, data);
+    })
 
     q.on('complete', async () => {
         await browser.close();

@@ -57,9 +57,13 @@ function runHandler(req, res) {
     res.status(200).send(`<!DOCTYPE html><head><title>${filePath} – Test Runner</title></head><body><script src="${bundlePath}"></script></body>`);
 }
 
-export async function startServer() {
+export async function startServer(options) {
     const app = express();
     app.get(/\/bundle\/(.*)/, bundleHandler);
     app.get(/\/run\/(.*)/, runHandler);
-    return app.listen(2662, () => console.log('Server started on port 2662…'));
+    return app.listen(2662, () => {
+        if (options.verbose) {
+            console.log('Server started at http://localhost:2662…')
+        }
+    });
 }
