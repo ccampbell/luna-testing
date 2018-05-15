@@ -30,7 +30,7 @@ export default class Queue {
             return;
         }
 
-        if (this.tasks.length === 0) {
+        if (this.tasks.length === 0 && this._active.length === 0) {
             this.fire('complete');
             return;
         }
