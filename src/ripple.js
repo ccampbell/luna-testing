@@ -1,3 +1,9 @@
+/**
+ * Ripple is a simple event manager that adds on, off, and fire events to any
+ * object.
+ *
+ * @type {Object}
+ */
 const ripple = {
     wrap: (obj) => {
         const callbacks = {};
