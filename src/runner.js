@@ -1,5 +1,6 @@
 // This is the runner that runs from node.js to execute the tests
 import { startServer, getBundle } from './server';
+import { extractFunctionNames } from './util';
 import Queue from './classes/Queue';
 
 const fs = require('fs');
@@ -11,6 +12,7 @@ async function getFilesToRun(path) {
     return new Promise((resolve, reject) => {
         const stats = fs.lstatSync(path);
         const paths = [];
+        let count = 0;
         if (stats.isFile()) {
             paths.push(path);
             resolve(paths);
@@ -19,7 +21,13 @@ async function getFilesToRun(path) {
 
         const walker = walk.walk(path);
         walker.on('file', (root, fileStats, next) => {
-            paths.push(`${root}/${fileStats.name}`);
+            const path = `${root}/${fileStats.name}`;
+            const contents = fs.readFileSync(path);
+            let numTests = extractFunctionNames(contents.toString()).length;
+            if (numTests > 0) {
+                paths.push(path);
+                count += numTests;
+            }
             next();
         });
 
@@ -28,7 +36,7 @@ async function getFilesToRun(path) {
         });
 
         walker.on('end', () => {
-            resolve(paths);
+            resolve({ paths, count });
         });
     });
 }
@@ -110,9 +118,11 @@ export async function runTests(options) {
     });
 
     let files = [];
+    let totalTests = 0;
     for (const path of options.paths) {
-        const newFiles = await getFilesToRun(path);
-        files = files.concat(newFiles);
+        let { paths, count } = await getFilesToRun(path);
+        files = files.concat(paths);
+        totalTests += count;
     }
 
     let server;

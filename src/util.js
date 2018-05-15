@@ -3,7 +3,7 @@ export function lower(string) {
 }
 
 export function extractFunctionNames(source) {
-    const re = /export(?: async)?\s+function\s+(.*?)\(/g;
+    const re = /export(?: async)?\s+function\s+(test.*?)\(/g;
     let match;
     const names = [];
     while (match = re.exec(source)) {
