@@ -13,7 +13,7 @@ function getTestCount(path) {
     return extractFunctionNames(contents.toString()).length;
 }
 
-async function getFilesToRun(path) {
+async function getFilesToRun(path, options) {
     return new Promise((resolve, reject) => {
         const stats = fs.lstatSync(path);
         const paths = [];
@@ -28,6 +28,11 @@ async function getFilesToRun(path) {
         walker.on('file', (root, fileStats, next) => {
             const path = `${root}/${fileStats.name}`;
             const testCount = getTestCount(path);
+
+            if (options.verbose && testCount == 0) {
+                console.log(`File: ${path} does not export any tests! Skipping…`);
+            }
+
             if (testCount > 0) {
                 paths.push(path);
                 count += testCount;
@@ -143,7 +148,7 @@ export async function runTests(options) {
     let files = [];
     let totalTests = 0;
     for (const path of options.paths) {
-        let { paths, count } = await getFilesToRun(path);
+        let { paths, count } = await getFilesToRun(path, options);
         files = files.concat(paths);
         totalTests += count;
     }
