@@ -3,7 +3,7 @@ const fs = require('fs');
 const argv = require('yargs').argv;
 const version = require('./../package.json').version;
 
-function showUsage() {
+function showUsage(message) {
     console.log([
         '        ,--.!,',
         '     __/   -*-',
@@ -13,13 +13,18 @@ function showUsage() {
     console.log('\n\x1B[1mUSAGE\x1B[0m');
     console.log('bomb /path/to/tests');
     console.log('\n\x1B[1mARGUMENTS\x1B[0m');
-    console.log('--concurrency    number of test files to run at a time (default: 1)')
-    console.log('--verbose        show verbose output when tests run')
-    console.log('--node           run unit tests from node environment instead of a browser')
+    console.log('--concurrency    number of test files to run at a time (default: 1)');
+    console.log('--verbose        show verbose output when tests run');
+    console.log('--node           run unit tests from node environment instead of a browser');
+
+    if (message) {
+        console.log(`\n⚠️  ${message}`);
+    }
+
 }
 
 if (argv._.length < 1) {
-    showUsage();
+    showUsage('No test path specified\n');
     process.exit(1);
 }
 
@@ -31,7 +36,7 @@ for (let i = 0; i < argv._.length; i++) {
 }
 
 if (paths.length === 0) {
-    showUsage();
+    showUsage('No files found at provided paths');
     process.exit(1);
 }
 
