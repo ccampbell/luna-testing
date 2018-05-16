@@ -90,6 +90,10 @@ async function runTestNode(testPath, options) {
             results = handleMessage(output.toString(), testPath, options);
         });
 
+        test.stderr.on('data', (output) => {
+            reject(output.toString());
+        })
+
         test.on('close', () => {
             resolve(results);
         });
