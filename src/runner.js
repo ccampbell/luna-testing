@@ -2,11 +2,14 @@
 import { startServer, getBundle } from './server';
 import { extractFunctionNames } from './util';
 import Queue from './classes/Queue';
+import ProgressBar from 'progress';
 
 const fs = require('fs');
 const spawn = require('child_process').spawn;
 const puppeteer = require('puppeteer');
 const walk = require('walk');
+
+let bar;
 
 function getTestCount(path) {
     const contents = fs.readFileSync(path);
@@ -75,9 +78,24 @@ function handleMessage(message, testPath, options) {
         return;
     }
 
+    if (!options.verbose && /^Finished/.test(message)) {
+        bar.tick();
+        return;
+    }
+
     if (/^Results/.test(message)) {
         return JSON.parse(message.slice(8));
     }
+}
+
+function groupLines(string) {
+    const bits = string.split(/^Results/gm);
+    let lines = bits[0].split('\n');
+    if (bits[1]) {
+        lines.push(`Results ${bits[1]}`);
+    }
+
+    return lines;
 }
 
 async function runTestNode(testPath, options) {
@@ -87,7 +105,10 @@ async function runTestNode(testPath, options) {
 
         let results = {};
         test.stdout.on('data', (output) => {
-            results = handleMessage(output.toString(), testPath, options);
+            const lines = groupLines(output.toString());
+            for (const line of lines) {
+                results = handleMessage(line, testPath, options);
+            }
         });
 
         test.stderr.on('data', (output) => {
@@ -162,6 +183,20 @@ export async function runTests(options) {
         return;
     }
 
+    if (!options.verbose) {
+        bar = new ProgressBar('[:bar] :percent', {
+            total: totalTests,
+            width: 50,
+            renderThrottle: 0,
+            callback: () => {
+                console.log('progress bar callback');
+                // process.stderr.write('\x1B[?25h');
+            }
+        });
+
+        // process.stderr.write('\x1B[?25l')
+    }
+
     let server;
     let browser;
     if (!options.node) {
@@ -187,14 +222,15 @@ export async function runTests(options) {
     // })
 
     q.on('taskend', (name, data) => {
-        console.log('taskend', name, data);
+        // console.log('taskend', name, data);
     });
 
     q.on('taskerror', (name, data) => {
-        console.log('taskerror', name, data);
+        // console.log('taskerror', name, data);
     });
 
     q.on('complete', async () => {
+        console.log('complete');
         if (!options.node) {
             await browser.close();
             await server.close();
