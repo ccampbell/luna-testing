@@ -1,6 +1,6 @@
 // This is the runner that runs from node.js to execute the tests
 import { startServer, getBundle } from './server';
-import { extractFunctionNames } from './util';
+import { extractFunctionNames, getElapsedTime } from './util';
 import Queue from './classes/Queue';
 import ProgressBar from 'progress';
 
@@ -165,7 +165,32 @@ function killWithError(message) {
     process.exit(1);
 }
 
+function logErrors(tests) {
+    const errors = [];
+    let count = 0;
+    for (const test of tests) {
+        if (test.type === 'taskerror') {
+            errors.push(test);
+            continue;
+        }
+
+        for (const result of test.data) {
+            count += 1;
+            if (result.failures > 0) {
+                errors.push(test);
+            }
+        }
+    }
+
+    if (errors.length === 0) {
+        // console.log(`📰  Finished running ${count} test${ count != 1 ? 's' : '' }`)
+        console.log(`✅  All tests passed!`)
+    }
+}
+
 export async function runTests(options) {
+    const startTime = new Date().getTime();
+
     const q = new Queue({
         concurrency: options.concurrency
     });
@@ -179,17 +204,22 @@ export async function runTests(options) {
     }
 
     if (totalTests === 0) {
-        killWithError(`There were no tests exported in the specified path${files.length != 1 ? 's' : ''}: ${files.join(', ')}`);
+        let pathsForError = files;
+        if (files.length === 0) {
+            pathsForError = options.paths;
+        }
+        killWithError(`There were no tests exported by: ${pathsForError.join(', ')}`);
         return;
     }
 
     if (!options.verbose) {
-        bar = new ProgressBar('[:bar] :percent', {
+        console.log('⏳  Running tests…');
+        bar = new ProgressBar('[:bar] :percent (:current/:total)', {
             total: totalTests,
             width: 50,
             renderThrottle: 0,
             callback: () => {
-                console.log('progress bar callback');
+                // console.log('progress bar callback');
                 // process.stderr.write('\x1B[?25h');
             }
         });
@@ -221,16 +251,32 @@ export async function runTests(options) {
     //     console.log('taskstart', name);
     // })
 
+    const results = [];
     q.on('taskend', (name, data) => {
+        results.push({
+            type: 'taskend',
+            name,
+            data
+        });
         // console.log('taskend', name, data);
     });
 
     q.on('taskerror', (name, data) => {
+        results.push({
+            type: 'taskerror',
+            name,
+            data
+        });
         // console.log('taskerror', name, data);
     });
 
     q.on('complete', async () => {
-        console.log('complete');
+        logErrors(results);
+
+        const endTime = new Date().getTime();
+
+        console.log(`✨  Took ${getElapsedTime(startTime, endTime)}`);
+
         if (!options.node) {
             await browser.close();
             await server.close();
