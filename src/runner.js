@@ -8,25 +8,29 @@ const spawn = require('child_process').spawn;
 const puppeteer = require('puppeteer');
 const walk = require('walk');
 
+function getTestCount(path) {
+    const contents = fs.readFileSync(path);
+    return extractFunctionNames(contents.toString()).length;
+}
+
 async function getFilesToRun(path) {
     return new Promise((resolve, reject) => {
         const stats = fs.lstatSync(path);
         const paths = [];
         let count = 0;
         if (stats.isFile()) {
-            paths.push(path);
-            resolve(paths);
+            const testCount = getTestCount(path);
+            resolve({ paths: [path], count: getTestCount(path) });
             return;
         }
 
         const walker = walk.walk(path);
         walker.on('file', (root, fileStats, next) => {
             const path = `${root}/${fileStats.name}`;
-            const contents = fs.readFileSync(path);
-            let numTests = extractFunctionNames(contents.toString()).length;
-            if (numTests > 0) {
+            const testCount = getTestCount(path);
+            if (testCount > 0) {
                 paths.push(path);
-                count += numTests;
+                count += testCount;
             }
             next();
         });
