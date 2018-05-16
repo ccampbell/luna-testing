@@ -25,6 +25,13 @@ export default class Queue {
         this.tasks.push(new Task(task, name));
     }
 
+    _markComplete(eventName, toRun, response) {
+        this.fire(eventName, toRun.name, response);
+        const index = this._active.indexOf(toRun);
+        this._active.splice(index, 1);
+        this._run();
+    }
+
     _run() {
         if (!this.running) {
             return;
@@ -41,14 +48,10 @@ export default class Queue {
 
             this.fire('taskstart', toRun.name);
             toRun.fn.then((response) => {
-                this.fire('taskend', toRun.name, response);
-                const index = this._active.indexOf(toRun);
-                this._active.splice(index, 1);
-                this._run();
+                this._markComplete('taskend', toRun, response);
             }).catch((e) => {
-                this.fire('taskerror', toRun.name, e);
-                this._run();
-            })
+                this._markComplete('taskerror', toRun, e);
+            });
         }
     }
 
