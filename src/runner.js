@@ -116,6 +116,13 @@ async function runTestBrowser(browser, testPath, options) {
     });
 }
 
+function killWithError(message) {
+    if (message) {
+        console.log(`⚠️  ${message}`);
+    }
+    process.exit(1);
+}
+
 export async function runTests(options) {
     const q = new Queue({
         concurrency: options.concurrency
@@ -127,6 +134,11 @@ export async function runTests(options) {
         let { paths, count } = await getFilesToRun(path);
         files = files.concat(paths);
         totalTests += count;
+    }
+
+    if (totalTests === 0) {
+        killWithError(`There were no tests exported in the specified path${files.length != 1 ? 's' : ''}: ${files.join(', ')}`);
+        return;
     }
 
     let server;
