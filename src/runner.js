@@ -101,6 +101,18 @@ async function runTestBrowser(browser, testPath, options) {
                 results = handleMessage(msg._text, testPath, options);
             });
 
+            page.on('response', async (response) => {
+                if (response.status() == 500) {
+                    // For some reason I can’t figure out how to get the
+                    // response body here. response.buffer(), response.text(),
+                    // and response.json() do not work. So I am including the
+                    // error in a header
+                    const headers = response.headers();
+                    await page.close();
+                    reject(JSON.parse(headers.error));
+                }
+            });
+
             page.on('pageerror', async (event) => {
                 await page.close();
                 reject(event);

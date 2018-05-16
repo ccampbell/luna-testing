@@ -53,8 +53,7 @@ async function bundleHandler(req, res) {
         res.set('Content-Type', 'application/javascript');
         res.send(code);
     } catch(e) {
-        console.error(e);
-        res.status(500).send(e);
+        res.set('Error', JSON.stringify(e.toString())).status(500).send({message: e.toString()});
         return;
     }
 }
