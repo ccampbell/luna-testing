@@ -1,8 +1,9 @@
 // This is the runner that runs from node.js to execute the tests
 import { startServer, getBundle } from './server';
-import { extractFunctionNames, getElapsedTime } from './util';
+import { extractFunctionNames, formatLine, getElapsedTime, syntaxHighlight, spaces } from './util';
 import Queue from './classes/Queue';
 import ProgressBar from 'progress';
+import chalk from 'chalk';
 
 const fs = require('fs');
 const spawn = require('child_process').spawn;
@@ -60,8 +61,8 @@ async function getFilesToRun(path, options) {
 // @see https://stackoverflow.com/questions/17581830/load-node-js-module-from-string-in-memory
 export async function singleRun(options) {
     function requireFromString(src, filename) {
-        var Module = module.constructor;
-        var m = new Module();
+        var m = new module.constructor();
+        m.paths = module.paths;
         m._compile(src, filename);
         return m.exports;
     }
@@ -165,9 +166,48 @@ function killWithError(message) {
     process.exit(1);
 }
 
+function logAssertion(testData) {
+    const lineNumber = testData.source.position.line;
+    const lineWidth = (lineNumber + 2).toString().length;
+
+    const indent = spaces(4);
+    console.log(`\n${chalk.yellow(formatLine(lineNumber - 1, lineWidth))}`);
+    console.log(`${chalk.yellow(formatLine(lineNumber, lineWidth))} ${indent}${syntaxHighlight(testData.source.code)}`);
+    const leftIndex = testData.source.code.indexOf(testData.left.code);
+    let rightIndex = -1;
+
+    if (testData.right) {
+        rightIndex = testData.source.code.indexOf(testData.right.code);
+    }
+
+    if (leftIndex > -1) {
+        console.log(`${chalk.yellow(formatLine(lineNumber + 1, lineWidth))} ${indent}${spaces(leftIndex)}${chalk.gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + chalk.gray('|') : ''}`);
+        console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${chalk.gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + syntaxHighlight(testData.right.value) : ''}`);
+        console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${syntaxHighlight(testData.left.value)}\n`);
+    }
+}
+
+function logError(error) {
+    console.log(`\n${chalk.bold.underline(error.name)}\n`);
+    if (error.type === 'taskerror') {
+        console.log(`⚠️  ${chalk.red(error.data)}`);
+        return;
+    }
+
+    for (const test of error.data) {
+        if (test.failures === 0) {
+            continue;
+        }
+
+        console.log(`❌  ${chalk.red.bold(test.name)}`);
+        logAssertion(test.data);
+    }
+}
+
 function logErrors(tests) {
     const errors = [];
     let count = 0;
+    let failures = 0;
     for (const test of tests) {
         if (test.type === 'taskerror') {
             errors.push(test);
@@ -177,15 +217,28 @@ function logErrors(tests) {
         for (const result of test.data) {
             count += 1;
             if (result.failures > 0) {
-                errors.push(test);
+                failures += result.failures;
+                if (errors.indexOf(test) === -1) {
+                    errors.push(test);
+                }
             }
         }
     }
 
     if (errors.length === 0) {
-        // console.log(`📰  Finished running ${count} test${ count != 1 ? 's' : '' }`)
-        console.log(`✅  All tests passed!`)
+        console.log(`💯  All tests passed!`);
+        return 0;
     }
+
+    if (failures > 0) {
+        console.log(`💔  ${failures} test${failures != 1 ? 's' : ''} failed!`);
+    }
+
+    for (const error of errors) {
+        logError(error);
+    }
+
+    return 1;
 }
 
 export async function runTests(options) {
@@ -213,8 +266,8 @@ export async function runTests(options) {
     }
 
     if (!options.verbose) {
-        console.log('⏳  Running tests…');
-        bar = new ProgressBar('[:bar] :percent (:current/:total)', {
+        console.log('🌙  Running tests…');
+        bar = new ProgressBar('⏳  [:bar] :percent (:current/:total)', {
             total: totalTests,
             width: 50,
             renderThrottle: 0,
@@ -271,17 +324,17 @@ export async function runTests(options) {
     });
 
     q.on('complete', async () => {
-        logErrors(results);
+        const exitCode = logErrors(results);
 
         const endTime = new Date().getTime();
 
-        console.log(`✨  Took ${getElapsedTime(startTime, endTime)}`);
+        console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
 
         if (!options.node) {
             await browser.close();
             await server.close();
         }
-        process.exit(0);
+        process.exit(exitCode);
     });
 
     q.start();

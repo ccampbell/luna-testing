@@ -23,6 +23,7 @@ export async function getBundle(filePath, node=false) {
 
             const bundle = await rollup.rollup({
                 input: node ? 'src/run-node.js': 'src/run-browser.js',
+                external: ['chalk'],
                 treeshake: true, // for testing
                 plugins
             });

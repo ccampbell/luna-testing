@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+
 export function lower(string) {
     return string.toLowerCase();
 }
@@ -37,4 +39,52 @@ export function getElapsedTime(startTime, endTime) {
 
     response += `${seconds} second${seconds != 1 ? 's' : ''}`;
     return response
+}
+
+export function syntaxHighlight(code) {
+    const operator = /\+|\!|\-|&|>|<|\||\*|\=/g;
+    const string = /('|")(.*?)(\1)/g;
+    const constant = /\b(\d+|true|false)\b/g;
+    let strings = [];
+    let stringMap = {};
+
+    code = code.replace(string, (match) => {
+        const stringName = `__STRING__${strings.length}`;
+        strings.push(stringName);
+        stringMap[stringName] = match;
+        return stringName;
+    });
+
+    code = code.replace(operator, (match) => {
+        return chalk.magenta(match)
+    });
+
+    code = code.replace(constant, (match) => {
+        return chalk.yellow(match);
+    });
+
+    for (const stringName of strings) {
+        code = code.replace(stringName, chalk.green(stringMap[stringName]));
+    }
+
+    return code;
+}
+
+export function spaces(count) {
+    let str = '';
+    for (let i = 0; i < count; i++) {
+        str += ' ';
+    }
+    return str;
+}
+
+export function formatLine(number, width) {
+    let numberString = number.toString();
+    let numberWidth = numberString.length;
+    while (numberWidth < width) {
+        numberString = ` ${numberString}`;
+        numberWidth += 1;
+    }
+
+    return numberString;
 }
