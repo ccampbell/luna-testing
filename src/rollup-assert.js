@@ -23,19 +23,19 @@ function escapeQuotes(string) {
     return string.replace(/'/g, "\\'");
 }
 
-function getReplacement(assertCode, file, position) {
+function getReplacement(assertCode, file, position, index) {
     const ast = esprima.parse(assertCode);
     const args = ast.body[0].expression.arguments;
 
     const isBinaryExpression = args[0].type === 'BinaryExpression';
     let leftCode = escodegen.generate(isBinaryExpression ? args[0].left : args[0]);
-    let newCode = `const left = ${leftCode};\n`;
+    let newCode = `const left${index} = ${leftCode};\n`;
     let rightCode = '';
     let operator = '';
     if (isBinaryExpression) {
         rightCode = escodegen.generate(args[0].right);
         operator = args[0].operator;
-        newCode += `const right = ${rightCode};\n`;
+        newCode += `const right${index} = ${rightCode};\n`;
     }
 
     newCode += `t.assert({
@@ -49,12 +49,12 @@ function getReplacement(assertCode, file, position) {
     },
     left: {
         code: '${escapeQuotes(leftCode)}',
-        value: left
+        value: JSON.stringify(left${index})
     }`;
 
     if (!isBinaryExpression) {
         newCode += `,
-    value: left\n`;
+    value: left${index}\n`;
     }
 
     if (isBinaryExpression) {
@@ -62,9 +62,9 @@ function getReplacement(assertCode, file, position) {
     operator: '${operator}',
     right: {
         code: '${escapeQuotes(rightCode)}',
-        value: right
+        value: JSON.stringify(right${index})
     },
-    value: left ${operator} right\n`;
+    value: left${index} ${operator} right${index}\n`;
     }
 
     newCode += '}';
@@ -90,14 +90,16 @@ export default function assert() {
 
             const magicString = new MagicString(code);
 
+            let i = 0;
             while (match = re.exec(code)) {
+                i += 1;
                 hasReplacements = true;
 
                 start = match.index;
                 end = start + match[0].length;
 
                 const position = findLineAndColumnForPosition(code, start);
-                const replacement = getReplacement(match[0], id, position);
+                const replacement = getReplacement(match[0], id, position, i);
 
                 magicString.overwrite(start, end, replacement);
             }
