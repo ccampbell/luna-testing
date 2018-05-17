@@ -82,7 +82,7 @@ export default function assert() {
     return {
         name: 'assert',
         transform(code, id) {
-            const re = /\bt\.assert\(.*?\);?(?=\n)/g;
+            const re = /((?:\/\/|\/\*)\s*)?\bt\.assert\(.*?\);?(?=\n)/g;
             let match;
             let start;
             let end;
@@ -92,6 +92,10 @@ export default function assert() {
 
             let i = 0;
             while (match = re.exec(code)) {
+                if (match[1]) {
+                    continue;
+                }
+
                 i += 1;
                 hasReplacements = true;
 
