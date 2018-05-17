@@ -5,7 +5,7 @@
   "main": "src/bomb.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup src/bomb.js -e magic-string,progress -o bin/bomb.js -f cjs --banner \"#!/usr/bin/env node\""
+    "build": "rollup src/bomb.js -e magic-string,progress,chalk -o bin/bomb.js -f cjs --banner \"#!/usr/bin/env node\""
   },
   "keywords": [
     "unit",
@@ -15,9 +15,9 @@
   ],
   "author": "Craig Campbell",
   "license": "MIT",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
+    "chalk": "^2.4.1",
     "escodegen": "^1.9.1",
     "esprima": "^4.0.0",
     "express": "^4.16.3",
