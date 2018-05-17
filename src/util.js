@@ -7,6 +7,7 @@ const constant = /\b(\d+|true|false)\b/g;
 const commentLine = /\/\/(.*)/g;
 const commentMultiline = /\/\*([\s\S]*?)\*\//g;
 
+// @todo maybe use esprima for this
 export function extractFunctionNames(source) {
     source = source.replace(commentLine, '');
     source = source.replace(commentMultiline, '');
