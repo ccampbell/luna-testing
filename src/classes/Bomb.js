@@ -41,6 +41,11 @@ export default class Bomb {
     }
 
     assert(assertion, message) {
+        // If an earlier assertion already failed then skip the rest
+        if (this.results[this.running].failures > 0) {
+            return;
+        }
+
         this.results[this.running].assertions += 1;
         if (assertion.value === false) {
             this.fail(message, assertion);
