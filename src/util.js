@@ -1,10 +1,18 @@
 import chalk from 'chalk';
 
-export function lower(string) {
-    return string.toLowerCase();
-}
+const operator = /\+|\!|\-|&|>|<|\||\*|\=/g;
+const string = /('|"|`)([\s\S]*?)(\1)/g;
+const escapedStringChars = /\\('|"|`)/g
+const constant = /\b(\d+|true|false)\b/g;
+const commentLine = /\/\/(.*)/g;
+const commentMultiline = /\/\*([\s\S]*?)\*\//g;
 
 export function extractFunctionNames(source) {
+    source = source.replace(commentLine, '');
+    source = source.replace(commentMultiline, '');
+    source = source.replace(escapedStringChars, '');
+    source = source.replace(string, '__STRING__');
+
     const re = /export(?: async)?\s+function\s+(test.*?)\(/g;
     let match;
     const names = [];
@@ -13,13 +21,6 @@ export function extractFunctionNames(source) {
     }
 
     return names;
-}
-
-export function namesToArray(names) {
-    let string = '[\n    \'';
-    string += names.join('\',\n    \'');
-    string += '\'\n];\n';
-    return string;
 }
 
 export function isAsync(fn) {
@@ -37,14 +38,15 @@ export function getElapsedTime(startTime, endTime) {
         response += `${minutes} minute${minutes != 1 ? 's' : ''}, `;
     }
 
+    if (seconds < 1) {
+        return response.slice(0, -2);
+    }
+
     response += `${seconds} second${seconds != 1 ? 's' : ''}`;
     return response
 }
 
 export function syntaxHighlight(code) {
-    const operator = /\+|\!|\-|&|>|<|\||\*|\=/g;
-    const string = /('|")(.*?)(\1)/g;
-    const constant = /\b(\d+|true|false)\b/g;
     let strings = [];
     let stringMap = {};
 
