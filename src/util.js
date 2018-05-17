@@ -39,7 +39,7 @@ export function getElapsedTime(startTime, endTime) {
         response += `${minutes} minute${minutes != 1 ? 's' : ''}, `;
     }
 
-    if (seconds < 1) {
+    if (seconds < 1 && minutes > 0) {
         return response.slice(0, -2);
     }
 

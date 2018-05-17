@@ -44,6 +44,10 @@ export function testGetElapsedTime(t) {
     end = start + 300000;
     elapsed = getElapsedTime(start, end);
     t.assert(elapsed === '5 minutes');
+
+    end = start + 550;
+    elapsed = getElapsedTime(start, end);
+    t.assert(elapsed === '0.55 seconds');
 }
 
 export function testSpaces(t) {
