@@ -8,21 +8,23 @@ import assert from './rollup-assert';
 export async function getBundle(filePath, node=false) {
     return new Promise(async (resolve, reject) => {
         try {
+            const plugins = [
+                replace({
+                    TEST_FILE_PATH: `${process.cwd()}/${filePath}`
+                }),
+                buble({
+                    target: {
+                        chrome: 63
+                    },
+                    jsx: 'React.createElement'
+                }),
+                assert()
+            ];
+
             const bundle = await rollup.rollup({
                 input: node ? 'src/run-node.js': 'src/run-browser.js',
                 treeshake: true, // for testing
-                plugins: [
-                    replace({
-                        TEST_FILE_PATH: `${process.cwd()}/${filePath}`
-                    }),
-                    buble({
-                        target: {
-                            chrome: 63
-                        },
-                        jsx: 'React.createElement'
-                    }),
-                    assert()
-                ]
+                plugins
             });
 
             let { code, map } = await bundle.generate({
