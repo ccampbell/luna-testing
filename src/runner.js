@@ -187,10 +187,14 @@ function logAssertion(testData) {
     }
 }
 
-function logError(error) {
+function logError(error, options) {
     console.log(`\n${chalk.bold.underline(error.name)}\n`);
     if (error.type === 'taskerror') {
-        console.log(`⚠️  ${chalk.red(error.data)}`);
+        console.log(`⚠️  ${chalk.red(error.data)}\n`);
+
+        if (!options.node) {
+            console.log(`❓  Perhaps you meant to run your tests in node using the ${chalk.bold('--node')} flag\n`);
+        }
         return;
     }
 
@@ -204,7 +208,7 @@ function logError(error) {
     }
 }
 
-function logErrors(tests) {
+function logErrors(tests, options) {
     const errors = [];
     let count = 0;
     let failures = 0;
@@ -235,7 +239,7 @@ function logErrors(tests) {
     }
 
     for (const error of errors) {
-        logError(error);
+        logError(error, options);
     }
 
     return 1;
@@ -324,7 +328,7 @@ export async function runTests(options) {
     });
 
     q.on('complete', async () => {
-        const exitCode = logErrors(results);
+        const exitCode = logErrors(results, options);
 
         const endTime = new Date().getTime();
 
