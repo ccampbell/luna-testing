@@ -204,7 +204,14 @@ function logError(error, options) {
         }
 
         console.log(`❌  ${chalk.red.bold(test.name)}`);
-        logAssertion(test.data);
+        if (test.data) {
+            logAssertion(test.data);
+            continue;
+        }
+
+        if (test.trace) {
+            console.log(`\n⚠️  ${test.trace.split('\n')[0]}\n`);
+        }
     }
 }
 
