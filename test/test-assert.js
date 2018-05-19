@@ -1,4 +1,4 @@
-import { escapeQuotes, findLineAndColumnForPosition } from '../src/assert';
+import { findLineAndColumnForPosition, getData } from '../src/assert';
 
 export function testFindLineAndColumnForPosition(t) {
     const someCode = `function something() {
@@ -16,7 +16,8 @@ export function testFindLineAndColumnForPosition(t) {
     t.assert(pos.column === 8);
 }
 
-export function testEscapeQuotes(t) {
-    const string = "what's going on";
-    t.assert(escapeQuotes(string) === "what");
-}
+// export function testGetData(t) {
+//     const name = 'Luna';
+//     const data = getData(`t.assert(name === 'luna');`, 'hogwarts', {line: 7, column: 7});
+//     t.assert(data === true);
+// }

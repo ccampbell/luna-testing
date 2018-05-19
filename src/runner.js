@@ -173,11 +173,11 @@ function logAssertion(testData) {
     const indent = spaces(4);
     console.log(`\n${chalk.yellow(formatLine(lineNumber - 1, lineWidth))}`);
     console.log(`${chalk.yellow(formatLine(lineNumber, lineWidth))} ${indent}${syntaxHighlight(testData.source.code)}`);
-    const leftIndex = testData.source.code.indexOf(testData.left.code);
+    const leftIndex = testData.left.range[0];
     let rightIndex = -1;
 
     if (testData.right) {
-        rightIndex = testData.source.code.indexOf(testData.right.code);
+        rightIndex = testData.right.range[0];
     }
 
     if (leftIndex > -1) {
