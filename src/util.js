@@ -91,3 +91,21 @@ export function formatLine(number, width) {
 
     return numberString;
 }
+
+export function looksTheSame(first, second) {
+    // change unquoted object properties to quoted
+    first = first.replace(/([{,])(.+?):/g, (match, first, second) => {
+        return `${first}"${second}":`;
+    });
+
+    try {
+        const parsedFirst = JSON.parse(first);
+        return JSON.stringify(parsedFirst) === JSON.stringify(second);
+    } catch(e) {
+        return false;
+    }
+}
+
+export function deepEquals(first, second) {
+    return JSON.stringify(first) === JSON.stringify(second);
+}

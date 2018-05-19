@@ -1,4 +1,4 @@
-import { isAsync } from '../util';
+import { isAsync, deepEquals } from '../util';
 
 export default class Bomb {
     constructor() {
@@ -47,6 +47,18 @@ export default class Bomb {
         }
 
         this.results[this.running].assertions += 1;
+
+        // Deep equal for objects
+        const isNotStrict = assertion.operator === '==' || assertion.operator === '!=';
+        const looksLikeObject = typeof assertion.left.value === 'object' || typeof assertion.right.value === 'object';
+        if (isNotStrict && looksLikeObject) {
+            assertion.value = deepEquals(assertion.left.value, assertion.right.value);
+
+            if (assertion.operator === '!=') {
+                assertion.value = !assertion.value;
+            }
+        }
+
         if (assertion.value === false) {
             this.fail(message, assertion);
         }

@@ -1,6 +1,6 @@
 // This is the runner that runs from node.js to execute the tests
 import { startServer, getBundle } from './server';
-import { extractFunctionNames, formatLine, getElapsedTime, syntaxHighlight, spaces } from './util';
+import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, syntaxHighlight, spaces } from './util';
 import Queue from './classes/Queue';
 import ProgressBar from 'progress';
 import chalk from 'chalk';
@@ -187,12 +187,17 @@ function logAssertion(testData) {
 
     if (testData.right) {
         rightIndex = testData.right.range[0];
+        if (looksTheSame(testData.right.code, testData.right.value)) {
+            rightIndex = -1;
+        }
     }
 
     if (leftIndex > -1) {
         console.log(`${chalk.yellow(formatLine(lineNumber + 1, lineWidth))} ${indent}${spaces(leftIndex)}${chalk.gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + chalk.gray('|') : ''}`);
-        console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${chalk.gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + syntaxHighlight(testData.right.value) : ''}`);
-        console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${syntaxHighlight(testData.left.value)}\n`);
+        if (rightIndex > -1) {
+            console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${chalk.gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + syntaxHighlight(JSON.stringify(testData.right.value)) : ''}`);
+        }
+        console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${syntaxHighlight(JSON.stringify(testData.left.value))}\n`);
     }
 }
 

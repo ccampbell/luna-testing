@@ -2,6 +2,16 @@ const esprima = require('esprima');
 const escodegen = require('escodegen');
 const MagicString = require('magic-string');
 
+const escodegenOptions = {
+    format: {
+        indent: {
+            style: ''
+        },
+        newline: '',
+        json: true
+    }
+};
+
 export function getData(assertCode, file, position) {
     const ast = esprima.parse(assertCode, { tolerant: true, range: true });
     const args = ast.body[0].expression.arguments;
@@ -16,7 +26,7 @@ export function getData(assertCode, file, position) {
             position
         },
         left: {
-            code: escodegen.generate(leftExpression),
+            code: escodegen.generate(leftExpression, escodegenOptions),
             value: '{{LEFT_VALUE}}',
             range: leftExpression.range
         },
@@ -26,14 +36,14 @@ export function getData(assertCode, file, position) {
     if (isBinaryExpression) {
         data.operator = args[0].operator;
         data.right = {
-            code: escodegen.generate(args[0].right),
+            code: escodegen.generate(args[0].right, escodegenOptions),
             value: '{{RIGHT_VALUE}}',
             range: args[0].right.range
         };
     }
 
     if (args.length > 1) {
-        data.message = escodegen.generate(args[1]);
+        data.message = escodegen.generate(args[1], escodegenOptions);
     }
 
     return data;
@@ -50,8 +60,8 @@ function getReplacement(assertCode, file, position, index) {
 
     let dataString = JSON.stringify(data);
 
-    dataString = dataString.replace('"{{LEFT_VALUE}}"', `JSON.stringify(_left${index})`);
-    dataString = dataString.replace('"{{RIGHT_VALUE}}"', `JSON.stringify(_right${index})`);
+    dataString = dataString.replace('"{{LEFT_VALUE}}"', `_left${index}`);
+    dataString = dataString.replace('"{{RIGHT_VALUE}}"', `_right${index}`);
     dataString = dataString.replace('"{{VALUE}}"', value);
 
     newCode += `\nt.assert(${dataString}`;
