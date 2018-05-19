@@ -1,4 +1,4 @@
-import { escapeQuotes, findLineAndColumnForPosition } from './util';
+import { escapeQuotes, findLineAndColumnForPosition } from './assert';
 import MagicString from 'magic-string';
 const esprima = require('esprima');
 const escodegen = require('escodegen');
