@@ -94,7 +94,7 @@ export function formatLine(number, width) {
 
 export function looksTheSame(first, second) {
     // change unquoted object properties to quoted
-    first = first.replace(/([{,])(.+?):/g, (match, first, second) => {
+    first = first.replace(/([{,]\s*)(.+?):/g, (match, first, second) => {
         return `${first}"${second}":`;
     });
 

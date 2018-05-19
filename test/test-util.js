@@ -3,6 +3,7 @@ import {
     formatLine,
     getElapsedTime,
     isAsync,
+    looksTheSame,
     spaces
 } from '../src/util';
 
@@ -66,4 +67,10 @@ export function testFormatLine(t) {
     t.assert(formatLine(55, 4) === '  55');
     t.assert(formatLine(100, 4) === ' 100');
     t.assert(formatLine(5, 1) === '5');
+}
+
+export function testLooksTheSame(t) {
+    const first = '{one: 1, two: 2, three: 3}';
+    const second = {"one":1,"two":2,"three":3};
+    t.assert(looksTheSame(first, second));
 }
