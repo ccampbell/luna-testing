@@ -11,6 +11,7 @@ const puppeteer = require('puppeteer');
 const walk = require('walk');
 
 let bar;
+const logs = [];
 
 function getTestCount(path) {
     const contents = fs.readFileSync(path);
@@ -74,18 +75,26 @@ export async function singleRun(options) {
 }
 
 function handleMessage(message, testPath, options) {
-    if (options.verbose && /^Running/.test(message)) {
-        console.log(`[${testPath}]`, message);
+    if (/^Running/.test(message)) {
+        if (options.verbose) {
+            console.log(`[${testPath}]`, message);
+        }
         return;
     }
 
-    if (!options.verbose && /^Finished/.test(message)) {
-        bar.tick();
+    if (/^Finished/.test(message)) {
+        if (!options.verbose) {
+            bar.tick();
+        }
         return;
     }
 
     if (/^Results/.test(message)) {
         return JSON.parse(message.slice(8));
+    }
+
+    if (message) {
+        logs.push(message);
     }
 }
 
@@ -252,6 +261,18 @@ function logErrors(tests, options) {
     return 1;
 }
 
+function logLogs() {
+    if (logs.length === 0) {
+        return;
+    }
+
+    console.log(chalk.bold.underline.blue('Console Logs\n'));
+    for (const log of logs) {
+        console.log(log);
+    }
+    console.log('');
+}
+
 export async function runTests(options) {
     const startTime = new Date().getTime();
 
@@ -338,6 +359,8 @@ export async function runTests(options) {
         const exitCode = logErrors(results, options);
 
         const endTime = new Date().getTime();
+
+        logLogs();
 
         console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
 
