@@ -1,6 +1,7 @@
 // This is the runner that runs from node.js to execute the tests
 import { startServer, getBundle } from './server';
-import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, syntaxHighlight, spaces } from './util';
+import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, spaces } from './util';
+import { syntaxHighlight } from './highlight';
 import Queue from './classes/Queue';
 import ProgressBar from 'progress';
 import chalk from 'chalk';
