@@ -75,6 +75,9 @@ export function testLooksTheSame(t) {
     const first = '{one: 1, two: 2, three: 3}';
     const second = {"one":1,"two":2,"three":3};
     t.assert(looksTheSame(first, second));
+
+    const anotherFirst = '{one: 1, two: 2, }';
+    t.assert(looksTheSame(anotherFirst, second) === false, 'Invalid JSON should be false');
 }
 
 export function testFindLineAndColumnForPosition(t) {
