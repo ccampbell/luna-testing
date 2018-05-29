@@ -206,7 +206,14 @@ function logAssertion(testData) {
     const indent = spaces(4);
     console.log(`\n${chalk.yellow(formatLine(lineNumber - 1, lineWidth))}`);
     console.log(`${chalk.yellow(formatLine(lineNumber, lineWidth))} ${indent}${syntaxHighlight(testData.source.code)}`);
-    const leftIndex = testData.left.range[0];
+    let leftIndex = testData.left.range[0];
+
+    // Move it to after the last dot
+    if (testData.left.code.indexOf('.') !== -1) {
+        const bits = testData.left.code.split('.');
+        bits.pop();
+        leftIndex += bits.join('.').length + 1;
+    }
     let rightIndex = -1;
 
     if (testData.right) {
