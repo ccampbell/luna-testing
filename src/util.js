@@ -1,9 +1,9 @@
-const operator = /\+|\!|\-|&|>|<|\||\*|\=/g;
-const string = /('|"|`)([\s\S]*?)(\1)/g;
-const escapedStringChars = /\\('|"|`)/g
-const constant = /\b(\d+|true|false)\b/g;
+export const constant = /\b(\d+|true|false)\b/g;
+export const operator = /\+|\!|\-|&|>|<|\||\*|\=/g;
+export const string = /('|"|`)([\s\S]*?)(\1)/g;
 const commentLine = /\/\/(.*)/g;
 const commentMultiline = /\/\*([\s\S]*?)\*\//g;
+const escapedStringChars = /\\('|"|`)/g;
 
 // @todo maybe use esprima for this
 export function extractFunctionNames(source) {

@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { string, operator, constant } from './util';
 
 export function syntaxHighlight(code) {
     let strings = [];
