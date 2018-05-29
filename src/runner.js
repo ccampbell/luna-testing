@@ -288,6 +288,10 @@ function logErrors(tests, options) {
     }
 
     if (failures > 0) {
+        if (options.fastFail) {
+            console.log('');
+        }
+
         console.log(`💔  ${failures} test${failures != 1 ? 's' : ''} failed!`);
     }
 
@@ -374,25 +378,8 @@ export async function runTests(options) {
     // })
 
     const results = [];
-    q.on('taskend', (name, data) => {
-        results.push({
-            type: 'taskend',
-            name,
-            data
-        });
-        // console.log('taskend', name, data);
-    });
 
-    q.on('taskerror', (name, data) => {
-        results.push({
-            type: 'taskerror',
-            name,
-            data
-        });
-        // console.log('taskerror', name, data);
-    });
-
-    q.on('complete', async () => {
+    async function handleComplete() {
         const exitCode = logErrors(results, options);
 
         const endTime = new Date().getTime();
@@ -424,8 +411,40 @@ export async function runTests(options) {
             await browser.close();
             await server.close();
         }
+
         process.exit(exitCode);
+    }
+
+    q.on('taskend', (name, data) => {
+        // console.log('taskend', name, data);
+        results.push({
+            type: 'taskend',
+            name,
+            data
+        });
+
+        let failures = data.reduce((a, b) => {
+            return a + b.failures;
+        }, 0);
+
+        if (options.fastFail && failures > 0) {
+            handleComplete();
+        }
     });
 
+    q.on('taskerror', (name, data) => {
+        // console.log('taskerror', name, data);
+        results.push({
+            type: 'taskerror',
+            name,
+            data
+        });
+
+        if (options.fastFail) {
+            handleComplete();
+        }
+    });
+
+    q.on('complete', handleComplete);
     q.start();
 }

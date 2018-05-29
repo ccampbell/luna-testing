@@ -12,8 +12,10 @@ function showUsage(message) {
         '   `9MMP\''].join('\n'));
     console.log('\n\x1B[1mUSAGE\x1B[0m');
     console.log('bomb /path/to/tests');
-    console.log('\n\x1B[1mARGUMENTS\x1B[0m');
+    console.log('\n\x1B[1mOPTIONS\x1B[0m');
     console.log('--concurrency    number of test files to run at a time (default: 1)');
+    console.log('--coverage       track and show code coverage');
+    console.log('--fast-fail      fail immediately after a test failure');
     console.log('--verbose        show verbose output when tests run');
     console.log('--node           run unit tests from node environment instead of a browser');
 
@@ -47,7 +49,8 @@ const options = {
     concurrency: argv.concurrency || 1,
     verbose: argv.verbose,
     node: argv.node,
-    singleRun: argv['single-run']
+    singleRun: argv['single-run'],
+    fastFail: argv['fast-fail']
 };
 
 (async () => {
