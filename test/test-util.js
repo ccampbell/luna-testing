@@ -1,6 +1,7 @@
 import {
     extractFunctionNames,
     findLineAndColumnForPosition,
+    findPositionForLineAndColumn,
     formatLine,
     getElapsedTime,
     isAsync,
@@ -87,4 +88,17 @@ export function testFindLineAndColumnForPosition(t) {
 
     const zero = findLineAndColumnForPosition(someCode, 0);
     t.assert(zero == {line: 1, column: 0});
+}
+
+export function testFindPositionForLineAndColumn(t) {
+    const someCode = `function something() {
+    const something = true;
+    return something;
+}`;
+
+    const position = findPositionForLineAndColumn(someCode, {line: 2, column: 7});
+    t.assert(position === 30);
+
+    const position2 = findPositionForLineAndColumn(someCode, {line: 1, column: 0});
+    t.assert(position2 === 0);
 }

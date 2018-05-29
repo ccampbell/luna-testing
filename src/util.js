@@ -103,3 +103,15 @@ export function findLineAndColumnForPosition(code, index) {
     column += (index - lastPos);
     return { line, column }
 }
+
+export function findPositionForLineAndColumn(code, { line = 0, column = 0} = {}) {
+    // Line is 1 indexed, Column is 0 indexed
+    const lines = code.split('\n');
+    let position = 0;
+    for (const lineToCount of lines.slice(0, line - 1)) {
+        position += lineToCount.length + 1; // \n
+    }
+
+    position += column;
+    return position;
+}
