@@ -3,9 +3,10 @@ const fs = require('fs');
 const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
+const coverage = require('rollup-plugin-istanbul');
 import assert from './rollup-assert';
 
-export async function getBundle(filePath, node=false) {
+export async function getBundle(filePath, isNode=false, includeCoverage=false) {
     return new Promise(async (resolve, reject) => {
         try {
             const plugins = [
@@ -21,15 +22,21 @@ export async function getBundle(filePath, node=false) {
                 assert()
             ];
 
+            if (isNode && includeCoverage) {
+                plugins.push(coverage({
+                    exclude: [filePath]
+                }));
+            }
+
             const bundle = await rollup.rollup({
-                input: node ? 'src/run-node.js': 'src/run-browser.js',
+                input: isNode ? 'src/run-node.js': 'src/run-browser.js',
                 external: ['chalk'],
                 treeshake: true, // for testing
                 plugins
             });
 
             let { code, map } = await bundle.generate({
-                format: node ? 'cjs': 'iife',
+                format: isNode ? 'cjs': 'iife',
                 freeze: true,
                 sourcemap: 'inline'
             });

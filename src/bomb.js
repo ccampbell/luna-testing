@@ -43,6 +43,7 @@ if (paths.length === 0) {
 const options = {
     paths,
     binary: argv.$0,
+    coverage: argv.coverage,
     concurrency: argv.concurrency || 1,
     verbose: argv.verbose,
     node: argv.node,
@@ -52,7 +53,21 @@ const options = {
 (async () => {
     try {
         if (options.singleRun) {
+            // There is a limitation on how much output can be captured from a
+            // child process:
+            //
+            // @see https://github.com/nodejs/node/issues/19218
+            let fileName;
+            if (options.coverage) {
+                fileName = `/tmp/coverage-${process.pid}.json`
+                console.log('Coverage', fileName);
+            }
+
             await singleRun(options);
+
+            if (options.coverage) {
+                fs.writeFileSync(fileName, JSON.stringify(__coverage__));
+            }
             process.exit(0);
             return;
         }

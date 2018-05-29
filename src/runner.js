@@ -2,6 +2,7 @@
 import { startServer, getBundle } from './server';
 import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, spaces } from './util';
 import { syntaxHighlight } from './highlight';
+import { puppeteerToIstanbul } from './coverage';
 import Queue from './classes/Queue';
 import ProgressBar from 'progress';
 import chalk from 'chalk';
@@ -10,9 +11,13 @@ const fs = require('fs');
 const spawn = require('child_process').spawn;
 const puppeteer = require('puppeteer');
 const walk = require('walk');
+const istanbul = require('istanbul-lib-coverage');
+const createReporter = require('istanbul-api').createReporter;
 
 let bar;
 const logs = [];
+let map = istanbul.createCoverageMap();
+let coveragePaths = [];
 
 function getTestCount(path) {
     const contents = fs.readFileSync(path);
@@ -70,7 +75,7 @@ export async function singleRun(options) {
     }
 
     const testPath = options.paths[0];
-    const code = await getBundle(testPath, true);
+    const code = await getBundle(testPath, true, options.coverage);
     const tests = requireFromString(code, '');
     return tests.run();
 }
@@ -94,6 +99,12 @@ function handleMessage(message, testPath, options) {
         return JSON.parse(message.slice(8));
     }
 
+    if (/^Coverage/.test(message)) {
+        const coverageFile = message.split('Coverage ')[1];
+        coveragePaths.push(coverageFile);
+        return;
+    }
+
     if (message) {
         logs.push(message);
     }
@@ -112,7 +123,11 @@ function groupLines(string) {
 async function runTestNode(testPath, options) {
     return new Promise((resolve, reject) => {
         // console.log('runTestNode', testPath, options);
-        var test = spawn(options.binary, [testPath, '--node', '--single-run']);
+        const args = [testPath, '--node', '--single-run'];
+        if (options.coverage) {
+            args.push('--coverage');
+        }
+        var test = spawn(options.binary, args);
 
         let results = {};
         test.stdout.on('data', (output) => {
@@ -136,6 +151,9 @@ async function runTestBrowser(browser, testPath, options) {
     return new Promise(async (resolve, reject) => {
         try {
             const page = await browser.newPage();
+
+            await page.coverage.startJSCoverage();
+
             const url = `http://localhost:2662/run/${testPath}`
             let results = {};
             page.on('console', msg => {
@@ -161,6 +179,11 @@ async function runTestBrowser(browser, testPath, options) {
 
             await page.goto(url, { timeout: 5000 });
             await page.waitForSelector('.done')
+
+            const jsCoverage = await page.coverage.stopJSCoverage();
+            const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
+            map.merge(istanbulCoverage);
+
             await page.close();
             resolve(results);
         } catch (e) {
@@ -235,6 +258,7 @@ function logErrors(tests, options) {
     let count = 0;
     let failures = 0;
     for (const test of tests) {
+        // console.log(test);
         if (test.type === 'taskerror') {
             errors.push(test);
             continue;
@@ -367,6 +391,25 @@ export async function runTests(options) {
         const endTime = new Date().getTime();
 
         logLogs();
+
+        if (options.coverage) {
+            for (const path of coveragePaths) {
+                const coverage = fs.readFileSync(path);
+                map.merge(JSON.parse(coverage));
+            }
+
+            // This is how to get the complete list of uncovered lines
+            // map.files().forEach(function (f) {
+            //     var fc = map.fileCoverageFor(f);
+            //     console.log(f, fc.getUncoveredLines());
+            // });
+
+            const reporter = createReporter();
+            reporter.addAll(['lcov', 'text', 'text-summary']);
+            reporter.write(map);
+
+            console.log(`💾  HTML coverage report available at ${chalk.bold.underline('coverage/lcov-report/index.html')}`);
+        }
 
         console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
 
