@@ -12,7 +12,7 @@ export function testFindLineAndColumnForPosition(t) {
 }`;
 
     const pos = findLineAndColumnForPosition(someCode, 30);
-    t.assert(pos == {line: 2, column: 8}, 'Position should match');
+    t.assert(pos == {line: 2, column: 7}, 'Position should match');
 }
 
 export function testGetData(t) {

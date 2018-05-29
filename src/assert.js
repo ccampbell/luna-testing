@@ -86,7 +86,7 @@ export function findLineAndColumnForPosition(code, index) {
         pos += nextLine.length + 1; // 1 for the \n
     }
 
-    column += (index - lastPos) + 1; // 1 to not be zero indexed
+    column += (index - lastPos);
     return { line, column }
 }
 
