@@ -2,6 +2,7 @@ import { runTests, singleRun } from './runner';
 const fs = require('fs');
 const argv = require('yargs').argv;
 const version = require('./../package.json').version;
+const ci = require('ci-info')
 
 function showUsage(message) {
     console.log([
@@ -52,6 +53,11 @@ const options = {
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail']
 };
+
+// Force verbose mode from a CI environment
+if (ci.isCI) {
+    options.verbose = true;
+}
 
 (async () => {
     try {
