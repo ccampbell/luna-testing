@@ -43,8 +43,8 @@ export function getData(assertCode, file, position) {
         };
     }
 
-    if (args.length > 1) {
-        data.message = escodegen.generate(args[1], escodegenOptions);
+    if (args.length > 1 && args[1].type === 'Literal') {
+        data.message = args[1].value;
     }
 
     return data;
@@ -67,7 +67,7 @@ function getReplacement(assertCode, file, position, index) {
 
     newCode += `\nt.assert(${dataString}`;
     if (data.message) {
-        newCode += `, ${data.message}`;
+        newCode += `, ${JSON.stringify(data.message)}`;
     }
     newCode += ');';
 

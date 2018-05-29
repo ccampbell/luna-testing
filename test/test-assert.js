@@ -19,4 +19,8 @@ export function testGetData(t) {
     const data2 = getData('t.assert(something);', 'somewhere', {line: 5, column: 10});
     t.assert(data2.left.code === 'something');
     t.assert(data2.hasOwnProperty('right') === false);
+
+    const data3 = getData('t.assert(something, "Something should be true");', 'somewhere', {line: 1, column: 0});
+    t.assert(data3.left.code === 'something');
+    t.assert(data3.message === 'Something should be true');
 }
