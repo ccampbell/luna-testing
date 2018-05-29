@@ -5,6 +5,10 @@ export function syntaxHighlight(code) {
     let strings = [];
     let stringMap = {};
 
+    if (code === undefined) {
+        return chalk.yellow('undefined');
+    }
+
     code = code.replace(string, (match) => {
         const stringName = `__STRING__${strings.length}`;
         strings.push(stringName);
