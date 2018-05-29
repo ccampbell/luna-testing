@@ -1,6 +1,6 @@
 import { getData } from '../src/assert';
 
-export function testDeepEqual(t) {
+export function testDeepEqualComparison(t) {
     const fruits = ['Apple', 'Blueberry', 'Strawberry'];
     t.assert(fruits == ['Apple', 'Blueberry', 'Strawberry']);
 }
