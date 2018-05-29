@@ -1,4 +1,4 @@
-import { getData } from '../src/assert';
+import { getData, transform } from '../src/assert';
 
 export function testDeepEqualComparison(t) {
     const fruits = ['Apple', 'Blueberry', 'Strawberry'];
@@ -23,4 +23,19 @@ export function testGetData(t) {
     const data3 = getData('t.assert(something, "Something should be true");', 'somewhere', {line: 1, column: 0});
     t.assert(data3.left.code === 'something');
     t.assert(data3.message === 'Something should be true');
+}
+
+export function testTransform(t) {
+    // This is a hack to make this work since otherwise it will match the regex
+    let code = `export function testSomething() {
+    const something = true;`;
+    code += `t.assert(something === false, 'Something should be true!');
+}`;
+    let result = transform(code, 'file.js');
+    t.assert(result.code != code, 'Code should have changed');
+
+    let code2 = `blah('t.assert(true);');
+    /* t.assert(something); */`;
+    result = transform(code2, 'file2.js');
+    t.assert(result === null, 'Code should not have changed');
 }
