@@ -95,6 +95,11 @@ export function findLineAndColumnForPosition(code, index) {
         pos += nextLine.length + 1; // 1 for the \n
     }
 
+    // If there is nothing to loop over
+    if (line === 0) {
+        line = 1;
+    }
+
     column += (index - lastPos);
     return { line, column }
 }

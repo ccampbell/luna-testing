@@ -84,4 +84,7 @@ export function testFindLineAndColumnForPosition(t) {
 
     const pos = findLineAndColumnForPosition(someCode, 30);
     t.assert(pos == {line: 2, column: 7}, 'Position should match');
+
+    const zero = findLineAndColumnForPosition(someCode, 0);
+    t.assert(zero == {line: 1, column: 0});
 }
