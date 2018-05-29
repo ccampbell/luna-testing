@@ -1,4 +1,5 @@
 import {
+    deepEquals,
     extractFunctionNames,
     findLineAndColumnForPosition,
     findPositionForLineAndColumn,
@@ -78,6 +79,28 @@ export function testLooksTheSame(t) {
 
     const anotherFirst = '{one: 1, two: 2, }';
     t.assert(looksTheSame(anotherFirst, second) === false, 'Invalid JSON should be false');
+}
+
+export function testDeepEquals(t) {
+    const first = {
+        one: 1,
+        two: 2,
+        three: {
+            number: 3,
+            text: 'three'
+        }
+    };
+
+    const second = {
+        three: {
+            number: 3,
+            text: 'three'
+        },
+        two: 2,
+        one: 1
+    };
+
+    t.assert(deepEquals(first, second) === true);
 }
 
 export function testFindLineAndColumnForPosition(t) {
