@@ -1,18 +1,8 @@
-import { findLineAndColumnForPosition, getData } from '../src/assert';
+import { getData } from '../src/assert';
 
 export function testDeepEqual(t) {
     const fruits = ['Apple', 'Blueberry', 'Strawberry'];
     t.assert(fruits == ['Apple', 'Blueberry', 'Strawberry']);
-}
-
-export function testFindLineAndColumnForPosition(t) {
-    const someCode = `function something() {
-    const something = true;
-    return something;
-}`;
-
-    const pos = findLineAndColumnForPosition(someCode, 30);
-    t.assert(pos == {line: 2, column: 7}, 'Position should match');
 }
 
 export function testGetData(t) {

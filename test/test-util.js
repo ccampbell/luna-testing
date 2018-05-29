@@ -1,5 +1,6 @@
 import {
     extractFunctionNames,
+    findLineAndColumnForPosition,
     formatLine,
     getElapsedTime,
     isAsync,
@@ -73,4 +74,14 @@ export function testLooksTheSame(t) {
     const first = '{one: 1, two: 2, three: 3}';
     const second = {"one":1,"two":2,"three":3};
     t.assert(looksTheSame(first, second));
+}
+
+export function testFindLineAndColumnForPosition(t) {
+    const someCode = `function something() {
+    const something = true;
+    return something;
+}`;
+
+    const pos = findLineAndColumnForPosition(someCode, 30);
+    t.assert(pos == {line: 2, column: 7}, 'Position should match');
 }

@@ -1,6 +1,7 @@
 const esprima = require('esprima');
 const escodegen = require('escodegen');
 const MagicString = require('magic-string');
+import { findLineAndColumnForPosition } from './util';
 
 const escodegenOptions = {
     format: {
@@ -71,23 +72,6 @@ function getReplacement(assertCode, file, position, index) {
     newCode += ');';
 
     return newCode;
-}
-
-export function findLineAndColumnForPosition(code, index) {
-    const lines = code.split('\n');
-    let pos = 0;
-    let lastPos = 0;
-    let line = 0;
-    let column = 0;
-    while (pos < index) {
-        const nextLine = lines.shift();
-        line += 1;
-        lastPos = pos;
-        pos += nextLine.length + 1; // 1 for the \n
-    }
-
-    column += (index - lastPos);
-    return { line, column }
 }
 
 export function transform(code, id) {
