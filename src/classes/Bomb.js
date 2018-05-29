@@ -26,13 +26,13 @@ export default class Bomb {
             }, this.timeout);
 
             if (isAsync(test)) {
-                test.call(this, this).then(resolve).catch(reject);
+                test(this).then(resolve).catch(reject);
                 return;
             }
 
             clearTimeout(timer);
             try {
-                test.call(this, this);
+                test(this);
                 resolve();
             } catch(e) {
                 reject(e);
