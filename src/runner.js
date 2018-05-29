@@ -173,8 +173,8 @@ async function runTestBrowser(browser, testPath, options) {
             });
 
             page.on('pageerror', async (event) => {
-                await page.close();
                 reject(event);
+                await page.close();
             });
 
             await page.goto(url, { timeout: 5000 });
