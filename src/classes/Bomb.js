@@ -80,10 +80,10 @@ export default class Bomb {
 
             try {
                 await this.run(testName, tests[testName]);
-                console.log('Finished', testName);
+                console.log('Finished', testName, this.results[this.running].failures);
             } catch (e) {
                 this.fail(e);
-                console.log('Finished', testName);
+                console.log('Finished', testName, 1);
             }
         }
 

@@ -82,16 +82,18 @@ export async function singleRun(options) {
 
 function handleMessage(message, testPath, options) {
     if (/^Running/.test(message)) {
-        if (options.verbose) {
-            console.log(`[${testPath}]`, message);
-        }
         return;
     }
 
     if (/^Finished/.test(message)) {
         if (!options.verbose) {
             bar.tick();
+            return;
         }
+
+        const messageBits = message.split(' ');
+        const failures = parseInt(messageBits[2], 10);
+        console.log(`${failures === 0 ? chalk.green.bold('✔︎') : chalk.red.bold('𝗫') } ${chalk.gray(`[${testPath}]`)}`, messageBits[1]);
         return;
     }
 
@@ -338,8 +340,8 @@ export async function runTests(options) {
         return;
     }
 
+    console.log('🌙  Running tests…');
     if (!options.verbose) {
-        console.log('🌙  Running tests…');
         bar = new ProgressBar('⏳  [:bar] :percent (:current/:total)', {
             total: totalTests,
             width: 50,
