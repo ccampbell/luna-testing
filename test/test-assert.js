@@ -33,6 +33,7 @@ export function testTransform(t) {
 }`;
     let result = transform(code, 'file.js');
     t.assert(result.code != code, 'Code should have changed');
+    t.assert(typeof result.map === 'object', 'Source map should be generated');
 
     let code2 = `blah('t.assert(true);');
     /* t.assert(something); */`;
