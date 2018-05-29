@@ -52,10 +52,10 @@ export function getData(assertCode, file, position) {
 
 function getReplacement(assertCode, file, position, index) {
     const data = getData(assertCode, file, position);
-    let newCode = `const _left${index} = ${data.left.code};`;
+    let newCode = `\n    const _left${index} = ${data.left.code};`;
     let value = `_left${index}`;
     if (data.right) {
-        newCode += `\nconst _right${index} = ${data.right.code};`;
+        newCode += `\n    const _right${index} = ${data.right.code};`;
         value += ` ${data.operator} _right${index}`;
     }
 
@@ -65,7 +65,7 @@ function getReplacement(assertCode, file, position, index) {
     dataString = dataString.replace('"{{RIGHT_VALUE}}"', `_right${index}`);
     dataString = dataString.replace('"{{VALUE}}"', value);
 
-    newCode += `\nt.assert(${dataString}`;
+    newCode += `\n    t.assert(${dataString}`;
     if (data.message) {
         newCode += `, ${JSON.stringify(data.message)}`;
     }
