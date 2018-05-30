@@ -1,7 +1,7 @@
 // This is the file that is actually loaded into the browser itself to run the
 // tests. It is not executed by node.js!
 import * as tests from 'TEST_FILE_PATH';
-import Bomb from './classes/Bomb';
+import Bomb from './classes/Luna';
 
 async function runAll() {
     const bomb = new Bomb();
