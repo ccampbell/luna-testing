@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "A simple, modern, opinionated unit testing framework",
   "main": "src/luna.js",
-  "bin": { "luna": "./bin/luna.js" },
+  "bin": {
+    "luna": "./bin/luna.js"
+  },
   "scripts": {
     "test": "bin/luna.js test -n",
     "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna.js -f cjs --banner \"#!/usr/bin/env node\n// v$npm_package_version\"",
-    "lint": "node_modules/eslint/bin/eslint.js src"
+    "lint": "node_modules/eslint/bin/eslint.js src",
+    "preversion": "yarn lint && yarn test",
+    "version": "yarn build"
   },
   "keywords": [
     "unit",
