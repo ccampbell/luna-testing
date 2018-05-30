@@ -5,7 +5,7 @@
   "main": "src/luna.js",
   "scripts": {
     "test": "bin/luna test -n",
-    "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna -f cjs --banner \"#!/usr/bin/env node\"",
+    "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna -f cjs --banner \"#!/usr/bin/env node\n// v$npm_package_version\"",
     "lint": "node_modules/eslint/bin/eslint.js src"
   },
   "keywords": [
