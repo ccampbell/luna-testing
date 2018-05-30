@@ -26,6 +26,7 @@ function getTestCount(path) {
 
 async function getFilesToRun(path, options) {
     return new Promise((resolve, reject) => {
+        path = path.replace(/\/+$/g, '');
         const stats = fs.lstatSync(path);
         const paths = [];
         let count = 0;
