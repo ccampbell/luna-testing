@@ -50,8 +50,7 @@ export default class Luna {
 
         // Deep equal for objects
         const isNotStrict = assertion.operator === '==' || assertion.operator === '!=';
-        const looksLikeObject = typeof assertion.left.value === 'object' || (assertion.right && typeof assertion.right.value === 'object');
-        if (isNotStrict && looksLikeObject) {
+        if (isNotStrict) {
             assertion.value = deepEquals(assertion.left.value, assertion.right.value);
 
             if (assertion.operator === '!=') {
