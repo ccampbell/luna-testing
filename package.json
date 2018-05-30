@@ -1,7 +1,7 @@
 {
   "name": "luna",
   "version": "1.0.0",
-  "description": "A simple, opinionated, batteries included unit testing framework",
+  "description": "A simple, modern, opinionated unit testing framework",
   "main": "src/luna.js",
   "scripts": {
     "test": "bin/luna test -n",
