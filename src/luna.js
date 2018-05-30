@@ -17,10 +17,10 @@ function showUsage(message) {
     console.log('-c, --concurrency      Number of test files to run at a time (default: 1)');
     console.log('-l, --coverage         Track and show code coverage');
     console.log('-f, --fast-fail        Fail immediately after a test failure');
-    console.log('-n, --node             Run unit tests from node environment instead of a browser');
-    console.log('-v, --verbose          Show verbose output when tests run');
-    console.log('-p, --port             Port to run webserver on (default: 5862)');
     console.log('-h, --help             Show usage');
+    console.log('-n, --node             Run unit tests from node environment instead of a browser');
+    console.log('-p, --port             Port to run webserver on (default: 5862)');
+    console.log('-v, --verbose          Show verbose output when tests run');
     console.log('--version              Show version');
 
     if (message) {
