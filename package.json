@@ -4,7 +4,7 @@
   "description": "A simple, opinionated, batteries included unit testing framework",
   "main": "src/luna.js",
   "scripts": {
-    "test": "bin/luna test --node",
+    "test": "bin/luna test -n",
     "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna -f cjs --banner \"#!/usr/bin/env node\""
   },
   "keywords": [
