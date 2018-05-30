@@ -1,6 +1,6 @@
 import { isAsync, deepEquals } from '../util';
 
-export default class Bomb {
+export default class Luna {
     constructor() {
         this.timeout = 5000;
         this.results = [];
