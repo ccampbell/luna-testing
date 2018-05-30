@@ -158,7 +158,7 @@ async function runTestBrowser(browser, testPath, options) {
 
             await page.coverage.startJSCoverage();
 
-            const url = `http://localhost:2662/run/${testPath}`;
+            const url = `http://localhost:${options.port}/run/${testPath}`;
             let results = {};
             page.on('console', (msg) => {
                 results = handleMessage(msg._text, testPath, options);

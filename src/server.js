@@ -5,6 +5,7 @@ const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const coverage = require('rollup-plugin-istanbul');
 import assert from './rollup-assert';
+import chalk from 'chalk';
 
 export async function getBundle(filePath, isNode = false, includeCoverage = false) {
     return new Promise(async(resolve, reject) => {
@@ -80,9 +81,9 @@ export async function startServer(options) {
     const app = express();
     app.get(/\/bundle\/(.*)/, bundleHandler);
     app.get(/\/run\/(.*)/, runHandler);
-    return app.listen(2662, () => {
+    return app.listen(options.port, () => {
         if (options.verbose) {
-            console.log('Server started at http://localhost:2662…');
+            console.log(`🔌  Server started at ${chalk.bold(`http://localhost:${options.port}`)}…`);
         }
     });
 }

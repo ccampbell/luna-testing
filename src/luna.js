@@ -19,6 +19,7 @@ function showUsage(message) {
     console.log('-f, --fast-fail        Fail immediately after a test failure');
     console.log('-n, --node             Run unit tests from node environment instead of a browser');
     console.log('-v, --verbose          Show verbose output when tests run');
+    console.log('-p, --port             Port to run webserver on (default: 5862)');
     console.log('-h, --help             Show usage');
     console.log('--version              Show version');
 
@@ -35,6 +36,7 @@ const argv = yargs
     .alias('f', 'fast-fail')
     .alias('n', 'node')
     .alias('l', 'coverage')
+    .alias('p', 'port')
     .help('').argv;
 
 if (argv.help) {
@@ -64,6 +66,7 @@ const options = {
     binary: argv.$0,
     coverage: argv.coverage,
     concurrency: argv.concurrency || 1,
+    port: argv.port || 5862,
     verbose: argv.verbose,
     node: argv.node,
     singleRun: argv['single-run'],
