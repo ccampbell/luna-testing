@@ -304,9 +304,14 @@ function logErrors(tests, options) {
     return 1;
 }
 
-function logLogs() {
+function logLogs(exitCode) {
     if (logs.length === 0) {
         return;
+    }
+
+    // If we are good an extra line before the console logs
+    if (exitCode === 0) {
+        console.log('');
     }
 
     console.log(chalk.bold.underline.blue('Console Logs\n'));
@@ -386,7 +391,7 @@ export async function runTests(options) {
 
         const endTime = new Date().getTime();
 
-        logLogs();
+        logLogs(exitCode);
 
         if (options.coverage) {
             for (const path of coveragePaths) {
