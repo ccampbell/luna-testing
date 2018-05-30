@@ -197,7 +197,7 @@ async function runTestBrowser(browser, testPath, options) {
 
 function killWithError(message) {
     if (message) {
-        console.log(`⚠️  ${message}`);
+        console.log(`⚠️  ${chalk.bold(message)}`);
     }
     process.exit(1);
 }

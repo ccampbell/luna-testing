@@ -1,4 +1,5 @@
 import { runTests, singleRun } from './runner';
+import chalk from 'chalk';
 const fs = require('fs');
 const yargs = require('yargs');
 const version = require('./../package.json').version;
@@ -22,7 +23,7 @@ function showUsage(message) {
     console.log('--version              Show version');
 
     if (message) {
-        console.log(`\n⚠️  ${message}`);
+        console.log(`\n⚠️  ${chalk.bold(message)}`);
     }
 }
 
