@@ -20,7 +20,7 @@ export function getData(assertCode, file, position) {
     const isBinaryExpression = args[0].type === 'BinaryExpression';
     const leftExpression = isBinaryExpression ? args[0].left : args[0];
 
-    let data = {
+    const data = {
         source: {
             code: assertCode,
             file,
@@ -84,7 +84,7 @@ export function transform(code, id) {
     const magicString = new MagicString(code);
 
     let i = 0;
-    while (match = re.exec(code)) {
+    while ((match = re.exec(code))) {
         if (match[1]) {
             continue;
         }
@@ -105,10 +105,8 @@ export function transform(code, id) {
         return null;
     }
 
-    let result = {
+    return {
         code: magicString.toString(),
         map: magicString.generateMap({ hires: true })
     };
-
-    return result;
 }

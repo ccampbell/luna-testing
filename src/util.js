@@ -15,7 +15,7 @@ export function extractFunctionNames(source) {
     const re = /export(?: async)?\s+function\s+(test.*?)\(/g;
     let match;
     const names = [];
-    while (match = re.exec(source)) {
+    while ((match = re.exec(source))) {
         names.push(match[1]);
     }
 
@@ -23,7 +23,7 @@ export function extractFunctionNames(source) {
 }
 
 export function isAsync(fn) {
-    const AsyncFunction = (async () => {}).constructor;
+    const AsyncFunction = (async() => {}).constructor;
     return fn instanceof AsyncFunction;
 }
 
@@ -34,15 +34,15 @@ export function getElapsedTime(startTime, endTime) {
 
     let response = '';
     if (minutes > 0) {
-        response += `${minutes} minute${minutes != 1 ? 's' : ''}, `;
+        response += `${minutes} minute${minutes !== 1 ? 's' : ''}, `;
     }
 
     if (seconds < 1 && minutes > 0) {
         return response.slice(0, -2);
     }
 
-    response += `${seconds} second${seconds != 1 ? 's' : ''}`;
-    return response
+    response += `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    return response;
 }
 
 export function spaces(count) {
@@ -66,14 +66,12 @@ export function formatLine(number, width) {
 
 export function looksTheSame(first, second) {
     // change unquoted object properties to quoted
-    first = first.replace(/([{,]\s*)(.+?):/g, (match, first, second) => {
-        return `${first}"${second}":`;
-    });
+    first = first.replace(/([{,]\s*)(.+?):/g, (match, group1, group2) => `${group1}"${group2}":`);
 
     try {
         const parsedFirst = JSON.parse(first);
         return JSON.stringify(parsedFirst) === JSON.stringify(second);
-    } catch(e) {
+    } catch (e) {
         return false;
     }
 }
@@ -81,6 +79,7 @@ export function looksTheSame(first, second) {
 // Taken from Stack Overflow
 //
 // @see https://stackoverflow.com/a/16788517/421333
+/* eslint-disable complexity, brace-style */
 export function deepEquals(x, y) {
     if (x === null || x === undefined || y === null || y === undefined) { return x === y; }
     // after this just checking type of one would be enough
@@ -100,10 +99,11 @@ export function deepEquals(x, y) {
     if (!(y instanceof Object)) { return false; }
 
     // recursive object equality check
-    var p = Object.keys(x);
-    return Object.keys(y).every(function (i) { return p.indexOf(i) !== -1; }) &&
-        p.every(function (i) { return deepEquals(x[i], y[i]); });
+    const p = Object.keys(x);
+    return Object.keys(y).every((i) => p.indexOf(i) !== -1) &&
+        p.every((i) => deepEquals(x[i], y[i]));
 }
+/* eslint-enable complexity, brace-style */
 
 export function findLineAndColumnForPosition(code, index) {
     const lines = code.split('\n');
@@ -124,10 +124,10 @@ export function findLineAndColumnForPosition(code, index) {
     }
 
     column += (index - lastPos);
-    return { line, column }
+    return { line, column };
 }
 
-export function findPositionForLineAndColumn(code, { line = 0, column = 0} = {}) {
+export function findPositionForLineAndColumn(code, { line = 0, column = 0 } = {}) {
     // Line is 1 indexed, Column is 0 indexed
     const lines = code.split('\n');
     let position = 0;

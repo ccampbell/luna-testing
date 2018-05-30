@@ -3,14 +3,14 @@ import chalk from 'chalk';
 const fs = require('fs');
 const yargs = require('yargs');
 const version = require('./../package.json').version;
-const ci = require('ci-info')
+const ci = require('ci-info');
 
 function showUsage(message) {
     console.log([
-    `            `,
-    `     ,/   * `,
-    `  _,'/_   |        Luna v${version}`,
-    `  \`(")' ,'/`].join('\n'));
+        '            ',
+        '     ,/   * ',
+        `  _,'/_   |        Luna v${version}`,
+        '  \`(")\' ,\'/'].join('\n'));
     console.log('\n\x1B[1mUSAGE\x1B[0m');
     console.log('luna /path/to/tests');
     console.log('\n\x1B[1mOPTIONS\x1B[0m');
@@ -75,7 +75,7 @@ if (ci.isCI) {
     options.verbose = true;
 }
 
-(async () => {
+(async() => {
     try {
         if (options.singleRun) {
             // There is a limitation on how much output can be captured from a
@@ -84,12 +84,13 @@ if (ci.isCI) {
             // @see https://github.com/nodejs/node/issues/19218
             let fileName;
             if (options.coverage) {
-                fileName = `/tmp/coverage-${process.pid}.json`
+                fileName = `/tmp/coverage-${process.pid}.json`;
                 console.log('Coverage', fileName);
             }
 
             await singleRun(options);
 
+            /* global __coverage__ */
             if (options.coverage) {
                 fs.writeFileSync(fileName, JSON.stringify(__coverage__));
             }
@@ -97,8 +98,8 @@ if (ci.isCI) {
             return;
         }
         await runTests(options);
-    } catch(e) {
+    } catch (e) {
         console.error('Error running tests', e);
         process.exit(1);
     }
-})()
+})();

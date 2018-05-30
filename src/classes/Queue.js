@@ -1,4 +1,3 @@
-import { isAsync } from '../util';
 import ripple from '../ripple';
 
 class Task {

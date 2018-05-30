@@ -6,5 +6,5 @@ export default function assert() {
         transform(code, id) {
             return transform(code, id);
         }
-    }
+    };
 }

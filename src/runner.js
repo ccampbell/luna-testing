@@ -16,8 +16,8 @@ const createReporter = require('istanbul-api').createReporter;
 
 let bar;
 const logs = [];
-let map = istanbul.createCoverageMap();
-let coveragePaths = [];
+const map = istanbul.createCoverageMap();
+const coveragePaths = [];
 
 function getTestCount(path) {
     const contents = fs.readFileSync(path);
@@ -31,22 +31,21 @@ async function getFilesToRun(path, options) {
         const paths = [];
         let count = 0;
         if (stats.isFile()) {
-            const testCount = getTestCount(path);
             resolve({ paths: [path], count: getTestCount(path) });
             return;
         }
 
         const walker = walk.walk(path);
         walker.on('file', (root, fileStats, next) => {
-            const path = `${root}/${fileStats.name}`;
-            const testCount = getTestCount(path);
+            const newPath = `${root}/${fileStats.name}`;
+            const testCount = getTestCount(newPath);
 
-            if (options.verbose && testCount == 0) {
-                console.log(`File: ${path} does not export any tests! Skipping…`);
+            if (options.verbose && testCount === 0) {
+                console.log(`File: ${newPath} does not export any tests! Skipping…`);
             }
 
             if (testCount > 0) {
-                paths.push(path);
+                paths.push(newPath);
                 count += testCount;
             }
             next();
@@ -69,7 +68,7 @@ async function getFilesToRun(path, options) {
 // @see https://stackoverflow.com/questions/17581830/load-node-js-module-from-string-in-memory
 export async function singleRun(options) {
     function requireFromString(src, filename) {
-        var m = new module.constructor();
+        const m = new module.constructor();
         m.paths = module.paths;
         m._compile(src, filename);
         return m.exports;
@@ -83,19 +82,19 @@ export async function singleRun(options) {
 
 function handleMessage(message, testPath, options) {
     if (/^Running/.test(message)) {
-        return;
+        return false;
     }
 
     if (/^Finished/.test(message)) {
         if (!options.verbose) {
             bar.tick();
-            return;
+            return false;
         }
 
         const messageBits = message.split(' ');
         const failures = parseInt(messageBits[2], 10);
-        console.log(`${failures === 0 ? chalk.green.bold('✔︎') : chalk.red.bold('𝗫') } ${chalk.gray(`[${testPath}]`)}`, messageBits[1]);
-        return;
+        console.log(`${failures === 0 ? chalk.green.bold('✔︎') : chalk.red.bold('𝗫')} ${chalk.gray(`[${testPath}]`)}`, messageBits[1]);
+        return false;
     }
 
     if (/^Results/.test(message)) {
@@ -105,17 +104,19 @@ function handleMessage(message, testPath, options) {
     if (/^Coverage/.test(message)) {
         const coverageFile = message.split('Coverage ')[1];
         coveragePaths.push(coverageFile);
-        return;
+        return false;
     }
 
     if (message) {
         logs.push(message);
     }
+
+    return false;
 }
 
 function groupLines(string) {
     const bits = string.split(/^Results/gm);
-    let lines = bits[0].split('\n');
+    const lines = bits[0].split('\n');
     if (bits[1]) {
         lines.push(`Results ${bits[1]}`);
     }
@@ -130,7 +131,7 @@ async function runTestNode(testPath, options) {
         if (options.coverage) {
             args.push('--coverage');
         }
-        var test = spawn(options.binary, args);
+        const test = spawn(options.binary, args);
 
         let results = {};
         test.stdout.on('data', (output) => {
@@ -142,7 +143,7 @@ async function runTestNode(testPath, options) {
 
         test.stderr.on('data', (output) => {
             reject(output.toString());
-        })
+        });
 
         test.on('close', () => {
             resolve(results);
@@ -151,20 +152,20 @@ async function runTestNode(testPath, options) {
 }
 
 async function runTestBrowser(browser, testPath, options) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             const page = await browser.newPage();
 
             await page.coverage.startJSCoverage();
 
-            const url = `http://localhost:2662/run/${testPath}`
+            const url = `http://localhost:2662/run/${testPath}`;
             let results = {};
-            page.on('console', msg => {
+            page.on('console', (msg) => {
                 results = handleMessage(msg._text, testPath, options);
             });
 
-            page.on('response', async (response) => {
-                if (response.status() == 500) {
+            page.on('response', async(response) => {
+                if (response.status() === 500) {
                     // For some reason I can’t figure out how to get the
                     // response body here. response.buffer(), response.text(),
                     // and response.json() do not work. So I am including the
@@ -175,13 +176,13 @@ async function runTestBrowser(browser, testPath, options) {
                 }
             });
 
-            page.on('pageerror', async (event) => {
+            page.on('pageerror', async(event) => {
                 reject(event);
                 await page.close();
             });
 
             await page.goto(url, { timeout: 5000 });
-            await page.waitForSelector('.done')
+            await page.waitForSelector('.done');
 
             const jsCoverage = await page.coverage.stopJSCoverage();
             const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
@@ -265,7 +266,6 @@ function logError(error, options) {
 
 function logErrors(tests, options) {
     const errors = [];
-    let count = 0;
     let failures = 0;
     for (const test of tests) {
         // console.log(test);
@@ -275,7 +275,6 @@ function logErrors(tests, options) {
         }
 
         for (const result of test.data) {
-            count += 1;
             if (result.failures > 0) {
                 failures += result.failures;
                 if (errors.indexOf(test) === -1) {
@@ -286,7 +285,7 @@ function logErrors(tests, options) {
     }
 
     if (errors.length === 0) {
-        console.log(`💯  All tests passed!`);
+        console.log('💯  All tests passed!');
         return 0;
     }
 
@@ -295,7 +294,7 @@ function logErrors(tests, options) {
             console.log('');
         }
 
-        console.log(`💔  ${failures} test${failures != 1 ? 's' : ''} failed!`);
+        console.log(`💔  ${failures} test${failures !== 1 ? 's' : ''} failed!`);
     }
 
     for (const error of errors) {
@@ -327,7 +326,7 @@ export async function runTests(options) {
     let files = [];
     let totalTests = 0;
     for (const path of options.paths) {
-        let { paths, count } = await getFilesToRun(path, options);
+        const { paths, count } = await getFilesToRun(path, options);
         files = files.concat(paths);
         totalTests += count;
     }
@@ -365,7 +364,7 @@ export async function runTests(options) {
 
     for (const filePath of files) {
         if (options.node) {
-            q.addTask(runTestNode(filePath,options), filePath);
+            q.addTask(runTestNode(filePath, options), filePath);
             continue;
         }
 
@@ -426,9 +425,7 @@ export async function runTests(options) {
             data
         });
 
-        let failures = data.reduce((a, b) => {
-            return a + b.failures;
-        }, 0);
+        const failures = data.reduce((a, b) => a + b.failures, 0);
 
         if (options.fastFail && failures > 0) {
             handleComplete();

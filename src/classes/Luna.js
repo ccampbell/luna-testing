@@ -34,7 +34,7 @@ export default class Luna {
             try {
                 test(this);
                 resolve();
-            } catch(e) {
+            } catch (e) {
                 reject(e);
             }
         });

@@ -6,8 +6,8 @@ const replace = require('rollup-plugin-replace');
 const coverage = require('rollup-plugin-istanbul');
 import assert from './rollup-assert';
 
-export async function getBundle(filePath, isNode=false, includeCoverage=false) {
-    return new Promise(async (resolve, reject) => {
+export async function getBundle(filePath, isNode = false, includeCoverage = false) {
+    return new Promise(async(resolve, reject) => {
         try {
             const plugins = [
                 replace({
@@ -29,17 +29,19 @@ export async function getBundle(filePath, isNode=false, includeCoverage=false) {
             }
 
             const bundle = await rollup.rollup({
-                input: isNode ? 'src/run-node.js': 'src/run-browser.js',
+                input: isNode ? 'src/run-node.js' : 'src/run-browser.js',
                 external: ['chalk'],
                 treeshake: true, // for testing
                 plugins
             });
 
+            /* eslint-disable prefer-const */
             let { code, map } = await bundle.generate({
-                format: isNode ? 'cjs': 'iife',
+                format: isNode ? 'cjs' : 'iife',
                 freeze: true,
                 sourcemap: 'inline'
             });
+            /* eslint-enable prefer-const */
 
             code += `\n//# sourceMappingURL=${map.toUrl()}\n`;
             resolve(code);
@@ -62,8 +64,8 @@ async function bundleHandler(req, res) {
         const code = await getBundle(filePath);
         res.set('Content-Type', 'application/javascript');
         res.send(code);
-    } catch(e) {
-        res.set('Error', JSON.stringify(e.toString())).status(500).send({message: e.toString()});
+    } catch (e) {
+        res.set('Error', JSON.stringify(e.toString())).status(500).send({ message: e.toString() });
         return;
     }
 }
@@ -80,7 +82,7 @@ export async function startServer(options) {
     app.get(/\/run\/(.*)/, runHandler);
     return app.listen(2662, () => {
         if (options.verbose) {
-            console.log('Server started at http://localhost:2662…')
+            console.log('Server started at http://localhost:2662…');
         }
     });
 }
