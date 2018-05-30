@@ -2,7 +2,7 @@
 
 Luna is a simple, modern, opinionated unit testing framework for testing JavaScript in a browser or with Node.js.
 
-Unlike other testing frameworks, Luna has no configuration options or files. This means it will not work for every use case, but it is designed to work very well in a majority of cases. If you have a use case that is not supported, but you think should be, feel free to [open an issue](https://github.com/ccampbell/luna/issues). It is possible that more command line flags or options will be added in the future.
+Unlike other testing frameworks, Luna has no configuration options or files. This means it will not work for every use case, but it is designed to work very well in a majority of cases.
 
 <!-- MarkdownTOC autolink="true" -->
 
@@ -105,7 +105,13 @@ Luna makes some assumptions about how your projects and tests should be written.
 
 - Fancy testing features are not needed
 
-    Out of the box Luna only supports a single function for tests. It does not have any mocking, monkey patching, or function wrapping capabilities. It also does not pollute and clutter the global namespace with a whole bunch of random variables. In fact, Luna only has support for a single function for test assertions `assert`.
+    Out of the box Luna does not have any mocking, monkey patching, setup, teardown, fixture, or function wrapping capabilities. It does not pollute or clutter the global namespace with a bunch of random variables. In fact, Luna only has support for a single `assert` function for test assertions.
+
+    The goal is to make it easy to get up and running as quickly as possible to encourage people who might not otherwise write tests to write some.
+
+    ---
+
+    This may actually be too limiting. If you have a use case that is not supported, but you think should be, feel free to [open an issue](https://github.com/ccampbell/luna/issues).
 
 - Your tests reference the assert method as `t.assert`
 
