@@ -40,3 +40,13 @@ export function testTransform(t) {
     result = transform(code2, 'file2.js');
     t.assert(result === null, 'Code should not have changed');
 }
+
+export async function testAsyncCode(t) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const thing = true;
+            t.assert(thing === true, 'This thing is true');
+            resolve();
+        }, 10);
+    });
+}
