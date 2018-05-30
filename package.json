@@ -1,11 +1,11 @@
 {
-  "name": "bomb",
+  "name": "luna",
   "version": "1.0.0",
   "description": "A simple, opinionated, batteries included unit testing framework",
-  "main": "src/bomb.js",
+  "main": "src/luna.js",
   "scripts": {
-    "test": "bin/bomb.js test --node",
-    "build": "rollup src/bomb.js -e magic-string,progress,chalk -o bin/bomb.js -f cjs --banner \"#!/usr/bin/env node\""
+    "test": "bin/luna test --node",
+    "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna -f cjs --banner \"#!/usr/bin/env node\""
   },
   "keywords": [
     "unit",
