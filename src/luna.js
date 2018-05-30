@@ -1,29 +1,44 @@
 import { runTests, singleRun } from './runner';
 const fs = require('fs');
-const argv = require('yargs').argv;
+const yargs = require('yargs');
 const version = require('./../package.json').version;
 const ci = require('ci-info')
 
 function showUsage(message) {
     console.log([
-        '        ,--.!,',
-        '     __/   -*-',
-        '   ,d08b.  \'|`',
-        `   0088MM          BOMB v${version}`,
-        '   `9MMP\''].join('\n'));
+    `            `,
+    `     ,/   * `,
+    `  _,'/_   |        Luna v${version}`,
+    `  \`(")' ,'/`].join('\n'));
     console.log('\n\x1B[1mUSAGE\x1B[0m');
-    console.log('bomb /path/to/tests');
+    console.log('luna /path/to/tests');
     console.log('\n\x1B[1mOPTIONS\x1B[0m');
-    console.log('--concurrency    number of test files to run at a time (default: 1)');
-    console.log('--coverage       track and show code coverage');
-    console.log('--fast-fail      fail immediately after a test failure');
-    console.log('--verbose        show verbose output when tests run');
-    console.log('--node           run unit tests from node environment instead of a browser');
+    console.log('-c, --concurrency      Number of test files to run at a time (default: 1)');
+    console.log('-l, --coverage         Track and show code coverage');
+    console.log('-f, --fast-fail        Fail immediately after a test failure');
+    console.log('-n, --node             Run unit tests from node environment instead of a browser');
+    console.log('-v, --verbose          Show verbose output when tests run');
+    console.log('-h, --help             Show usage');
+    console.log('--version              Show version');
 
     if (message) {
         console.log(`\n⚠️  ${message}`);
     }
+}
 
+// Override default help
+const argv = yargs
+    .alias('h', 'help')
+    .alias('v', 'verbose')
+    .alias('c', 'concurrency')
+    .alias('f', 'fast-fail')
+    .alias('n', 'node')
+    .alias('l', 'coverage')
+    .help('').argv;
+
+if (argv.help) {
+    showUsage();
+    process.exit(0);
 }
 
 if (argv._.length < 1) {
