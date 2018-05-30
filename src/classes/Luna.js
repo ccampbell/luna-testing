@@ -59,11 +59,11 @@ export default class Luna {
         }
 
         if (assertion.value === false) {
-            this.fail(message, assertion);
+            this._fail(message, assertion);
         }
     }
 
-    fail(message, extraData) {
+    _fail(message, extraData) {
         this.results[this.running].failures += 1;
         this.results[this.running].error = message || 'Assertion failed';
         this.results[this.running].trace = new Error(message).stack;
@@ -81,7 +81,7 @@ export default class Luna {
                 await this.run(testName, tests[testName]);
                 console.log('Finished', testName, this.results[this.running].failures);
             } catch (e) {
-                this.fail(e);
+                this._fail(e);
                 console.log('Finished', testName, 1);
             }
         }
