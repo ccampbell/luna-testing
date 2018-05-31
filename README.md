@@ -133,6 +133,7 @@ Even though Luna does not support any configuration options via a config file, i
 | <pre>`-h, --help`</pre> | Help | Shows help output | n/a |
 | <pre>`-n, --node`</pre> | Node | Run tests in node environment instead of in a browser | false |
 | <pre>`-p, --port`</pre> | Port | The port to use for the webserver that is used to serve js files to the browser | 5862 |
+| <pre>`-t, --timeout`</pre> | Timeout | The amount of time in seconds to wait for asynchronous functions to complete | 5 |
 | <pre>`-v, --verbose`</pre> | Verbose | Show verbose output. This lists the result of each test as it completes. Verbose mode is triggered automatically when running from a continuous integration service such as travis. | false |
 
 ## Defining tests
@@ -169,7 +170,7 @@ export async function testAsyncCode(t) {
 }
 ```
 
-As soon as the promise resolves, the test is considered to have completed. If you reject, it will be considered an error instead of a failure. There is also a five second timeout. If the test does not finish in five seconds, it will be marked as an error.
+As soon as the promise resolves, the test is considered to have completed. If you reject, it will be considered an error instead of a failure. There is also a configurable timeout. If the test does not finish in a certain amount of time (default is five seconds), it will be marked as an error.
 
 ### Skipping tests
 
