@@ -5,6 +5,10 @@ const v8toIstanbul = require('v8-to-istanbul');
 
 function addRangeToCoverage(newCoverage, sources, start, end) {
     const index = sources.indexOf(start.source);
+    if (end === null) {
+        end = start;
+    }
+
     newCoverage[index].ranges.push({
         start: findPositionForLineAndColumn(newCoverage[index].text, start),
         end: findPositionForLineAndColumn(newCoverage[index].text, end)
