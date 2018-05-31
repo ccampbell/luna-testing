@@ -70,7 +70,7 @@ export default class Luna {
     _fail(message, extraData) {
         this.results[this.running].failures += 1;
         this.results[this.running].error = message || 'Assertion failed';
-        this.results[this.running].trace = new Error(message).stack;
+        this.results[this.running].trace = message instanceof Error ? message.stack : new Error(message).stack;
         this.results[this.running].data = extraData;
     }
 

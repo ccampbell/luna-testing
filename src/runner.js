@@ -2,7 +2,7 @@
 import { startServer, getBundle } from './server';
 import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, spaces, PREFIX } from './util';
 import { syntaxHighlight } from './highlight';
-import { puppeteerToIstanbul } from './coverage';
+import { puppeteerToIstanbul, applySourceMapToTrace } from './coverage';
 import Queue from './classes/Queue';
 import ProgressBar from 'progress';
 import chalk from 'chalk';
@@ -194,6 +194,14 @@ async function runTestBrowser(browser, testPath, options) {
                 sourceMapError = e;
             }
 
+            for (let i = 0; i < results.length; i++) {
+                if (results[i].trace) {
+                    try {
+                        results[i].trace = await applySourceMapToTrace(results[i].trace, jsCoverage);
+                    } catch (e) {}
+                }
+            }
+
             await page.close();
             resolve(results);
         } catch (e) {
@@ -265,7 +273,7 @@ function logError(error, options) {
         }
 
         if (test.trace) {
-            console.log(`\n⚠️  ${test.trace.split('\n')[0]}\n`);
+            console.log(`\n⚠️  ${test.trace}\n`);
         }
     }
 }

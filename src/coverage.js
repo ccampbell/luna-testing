@@ -61,6 +61,11 @@ function addToCoverage({ newCoverage, sources, code, range, consumer }) {
     }
 }
 
+function getSourceMapData(coverage) {
+    const [, sourceMapString] = coverage.text.split('# sourceMappingURL=data:application/json;charset=utf-8;base64,');
+    const buf = Buffer.from(sourceMapString, 'base64');
+    return JSON.parse(buf.toString());
+}
 
 async function resolveSourceMap(coverage, ignore) {
     // Should return an array like
@@ -75,10 +80,7 @@ async function resolveSourceMap(coverage, ignore) {
     //     text: "fileContents"
     // }]
     const newCoverage = [];
-
-    const [, sourceMapString] = coverage.text.split('# sourceMappingURL=data:application/json;charset=utf-8;base64,');
-    const buf = Buffer.from(sourceMapString, 'base64');
-    const sourceMapData = JSON.parse(buf.toString());
+    const sourceMapData = getSourceMapData(coverage);
 
     let remove = [];
     for (let i = 0; i < sourceMapData.sources.length; i++) {
@@ -154,6 +156,36 @@ function convertToIstanbul(coverage) {
     });
 
     return fullJson;
+}
+
+function applySourceMapToLine(line, consumer) {
+    return line.replace(/\(.*?\)$/, (match) => {
+        const matchBits = match.split(':');
+        if (matchBits.length < 3) {
+            return match;
+        }
+
+        const position = {
+            column: parseInt(matchBits.pop(), 10),
+            line: parseInt(matchBits.pop(), 10),
+            bias: sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND
+        };
+
+        const originalPosition = consumer.originalPositionFor(position);
+        return `(${originalPosition.source}:${originalPosition.line}:${originalPosition.column})`;
+    });
+}
+
+export async function applySourceMapToTrace(trace, coverage) {
+    const sourceMapData = getSourceMapData(coverage[0]);
+    let lines = trace.split('\n');
+    await sourceMap.SourceMapConsumer.with(sourceMapData, null, (consumer) => {
+        for (let i = 0; i < lines.length; i++) {
+            lines[i] = applySourceMapToLine(lines[i], consumer);
+        }
+    });
+
+    return lines.join('\n');
 }
 
 export async function puppeteerToIstanbul(coverage, ignore) {
