@@ -93,7 +93,7 @@ function handleMessage(message, testPath, options) {
 
         const messageBits = message.split(' ');
         const failures = parseInt(messageBits[2], 10);
-        console.log(`${failures === 0 ? chalk.green.bold('✔︎') : chalk.red.bold('𝗫')} ${chalk.gray(`[${testPath}]`)}`, messageBits[1]);
+        console.log(`${failures === 0 ? chalk.green.bold('✔︎') : chalk.red.bold('𝗫')}  ${chalk.gray(`[${testPath}]`)}`, messageBits[1]);
         return false;
     }
 
