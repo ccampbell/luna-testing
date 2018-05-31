@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
@@ -33,7 +34,7 @@ export async function getBundle(filePath, options) {
             }
 
             const bundle = await rollup.rollup({
-                input: options.node ? 'src/run-node.js' : 'src/run-browser.js',
+                input: path.resolve(`${__dirname}/../src`, options.node ? 'run-node.js' : 'run-browser.js'),
                 external: ['chalk'],
                 treeshake: true,
                 plugins
