@@ -46,7 +46,7 @@ It’s as easy as 1, 2, 3…
 1. Run the tests
 
     ```shell
-    ./node_modules/.bin/luna test/test-something.js
+    npx luna test/test-something.js
     ```
 
 ### Specifying multiple test paths
