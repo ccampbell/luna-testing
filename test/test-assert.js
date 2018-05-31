@@ -27,7 +27,7 @@ export function testGetData(t) {
 
 export function testTransform(t) {
     // This is a hack to make this work since otherwise it will match the regex
-    let code = `export function testSomething() {
+    let code = `export function testSomething(t) {
     const something = true;`;
     code += `t.assert(something === false, 'Something should be true!');
 }`;
