@@ -155,7 +155,14 @@ export async function puppeteerToIstanbul(coverage, ignore) {
         }
 
         coverage = coverage[0];
-        const sourceMapCoverage = await resolveSourceMap(coverage, ignore);
+        let sourceMapCoverage;
+        try {
+            sourceMapCoverage = await resolveSourceMap(coverage, ignore);
+        } catch (e) {
+            reject(e);
+            return;
+        }
+
         const v8Coverage = convertToV8(sourceMapCoverage);
         const istanbulCoverage = convertToIstanbul(v8Coverage);
         resolve(istanbulCoverage);

@@ -15,6 +15,7 @@ const istanbul = require('istanbul-lib-coverage');
 const createReporter = require('istanbul-api').createReporter;
 
 let bar;
+let sourceMapError = null;
 const logs = [];
 const map = istanbul.createCoverageMap();
 const coveragePaths = [];
@@ -185,8 +186,13 @@ async function runTestBrowser(browser, testPath, options) {
             await page.waitForSelector('.done');
 
             const jsCoverage = await page.coverage.stopJSCoverage();
-            const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
-            map.merge(istanbulCoverage);
+
+            try {
+                const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
+                map.merge(istanbulCoverage);
+            } catch (e) {
+                sourceMapError = e;
+            }
 
             await page.close();
             resolve(results);
@@ -321,6 +327,31 @@ function logLogs(exitCode) {
     console.log('');
 }
 
+function logCoverage() {
+    if (sourceMapError !== null) {
+        console.log('⚠️  Error generating sourcemaps')
+        console.log(sourceMapError);
+        return;
+    }
+
+    for (const path of coveragePaths) {
+        const coverage = fs.readFileSync(path);
+        map.merge(JSON.parse(coverage));
+    }
+
+    // This is how to get the complete list of uncovered lines
+    // map.files().forEach(function (f) {
+    //     var fc = map.fileCoverageFor(f);
+    //     console.log(f, fc.getUncoveredLines());
+    // });
+
+    const reporter = createReporter();
+    reporter.addAll(['lcov', 'text', 'text-summary']);
+    reporter.write(map);
+
+    console.log(`💾  HTML coverage report available at ${chalk.bold.underline('coverage/lcov-report/index.html')}`);
+}
+
 export async function runTests(options) {
     const startTime = new Date().getTime();
 
@@ -394,22 +425,7 @@ export async function runTests(options) {
         logLogs(exitCode);
 
         if (options.coverage) {
-            for (const path of coveragePaths) {
-                const coverage = fs.readFileSync(path);
-                map.merge(JSON.parse(coverage));
-            }
-
-            // This is how to get the complete list of uncovered lines
-            // map.files().forEach(function (f) {
-            //     var fc = map.fileCoverageFor(f);
-            //     console.log(f, fc.getUncoveredLines());
-            // });
-
-            const reporter = createReporter();
-            reporter.addAll(['lcov', 'text', 'text-summary']);
-            reporter.write(map);
-
-            console.log(`💾  HTML coverage report available at ${chalk.bold.underline('coverage/lcov-report/index.html')}`);
+            logCoverage();
         }
 
         console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
