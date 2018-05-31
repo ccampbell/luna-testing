@@ -7,8 +7,12 @@ export default class Luna {
         this.running = -1;
     }
 
+    _log(...args) {
+        console.log(...args);
+    }
+
     async run(testName, test) {
-        console.log('Running', testName);
+        this._log('Running', testName);
 
         const count = this.results.push({
             name: testName,
@@ -79,13 +83,13 @@ export default class Luna {
 
             try {
                 await this.run(testName, tests[testName]);
-                console.log('Finished', testName, this.results[this.running].failures);
+                this._log('Finished', testName, this.results[this.running].failures);
             } catch (e) {
                 this._fail(e);
-                console.log('Finished', testName, 1);
+                this._log('Finished', testName, 1);
             }
         }
 
-        console.log('Results', JSON.stringify(this.results));
+        this._log('Results', JSON.stringify(this.results));
     }
 }
