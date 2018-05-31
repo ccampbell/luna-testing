@@ -243,7 +243,7 @@ Using a single assert function means there is nothing special that you have to l
 
 ## Runtime
 
-A lot of times if you want to run tests in a browser you have to set up a complicated testing environment using Karma, Mocha, Babel, Webpack, Phantom, JSDOM, etc. With Luna everything runs in a browser by default. You do not have to configure anything. Each test module gets dynamically built into a single js file in memory which is loaded and executed in a browser. It uses console messages to relay information back to the node runtime.
+A lot of times if you want to run tests in a browser you have to set up a complicated testing environment using Karma, Mocha, Babel, Webpack, Phantom, jsdom, etc. With Luna everything runs in a browser by default. You do not have to configure anything. Each test module gets dynamically built into a single js file in memory which is loaded and executed in a browser. It uses console messages to relay information back to the node runtime.
 
 Luna uses [puppeteer](https://github.com/GoogleChrome/puppeteer) to launch an instance of headless Chromium, opens each test file in a new tab in the browser, then closes it after the tests complete.
 
