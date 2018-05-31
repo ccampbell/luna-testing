@@ -260,7 +260,7 @@ It uses a backpressure queue to limit the maximum number of tests that can run a
 
 Code coverage is reported if you pass the `--coverage` argument when running your tests. In node it uses [istanbul](https://istanbul.js.org/) to instrument your code and then displays a coverage report to your shell. It also creates a `coverage` directory in the root of your project which contains an HTML page you can view in your browser to see the code coverage on a file by file basis.
 
-When running via the browser it uses the puppeteer JS coverage reporting methods. Unfortunately, they do not seem to match exactly with what istanbul reports, but it is will still give you a pretty good idea. The puppeteer coverage output also does not support source maps so Luna has to do a bunch of work to apply the source maps and then transform it into a format that can be consumed by the istanbul API for actually reporting the coverage.
+When running via the browser it uses the puppeteer JS coverage reporting methods. Unfortunately, they do not seem to match exactly with what istanbul reports, but it is will still give you a pretty good idea. The puppeteer coverage output also [does not support source maps](https://github.com/GoogleChrome/puppeteer/issues/985) so Luna has to do a bunch of work to apply the source maps and then transform it into a format that can be consumed by the istanbul API for actually reporting the coverage.
 
 ## Testing Luna
 
