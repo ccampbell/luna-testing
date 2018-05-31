@@ -7,12 +7,15 @@ const coverage = require('rollup-plugin-istanbul');
 import assert from './rollup-assert';
 import chalk from 'chalk';
 
-export async function getBundle(filePath, isNode = false, includeCoverage = false) {
+let runOptions;
+
+export async function getBundle(filePath, options) {
     return new Promise(async(resolve, reject) => {
         try {
             const plugins = [
                 replace({
-                    TEST_FILE_PATH: `${process.cwd()}/${filePath}`
+                    TEST_FILE_PATH: `${process.cwd()}/${filePath}`,
+                    TEST_TIMEOUT: options.timeout
                 }),
                 buble({
                     target: {
@@ -23,22 +26,22 @@ export async function getBundle(filePath, isNode = false, includeCoverage = fals
                 assert()
             ];
 
-            if (isNode && includeCoverage) {
+            if (options.node && options.coverage) {
                 plugins.push(coverage({
                     exclude: [filePath]
                 }));
             }
 
             const bundle = await rollup.rollup({
-                input: isNode ? 'src/run-node.js' : 'src/run-browser.js',
+                input: options.node ? 'src/run-node.js' : 'src/run-browser.js',
                 external: ['chalk'],
-                treeshake: true, // for testing
+                treeshake: true,
                 plugins
             });
 
             /* eslint-disable prefer-const */
             let { code, map } = await bundle.generate({
-                format: isNode ? 'cjs' : 'iife',
+                format: options.node ? 'cjs' : 'iife',
                 freeze: true,
                 sourcemap: 'inline'
             });
@@ -62,7 +65,7 @@ async function bundleHandler(req, res) {
     }
 
     try {
-        const code = await getBundle(filePath);
+        const code = await getBundle(filePath, runOptions);
         res.set('Content-Type', 'application/javascript');
         res.send(code);
     } catch (e) {
@@ -78,6 +81,8 @@ function runHandler(req, res) {
 }
 
 export async function startServer(options) {
+    runOptions = options;
+
     const app = express();
     app.get(/\/bundle\/(.*)/, bundleHandler);
     app.get(/\/run\/(.*)/, runHandler);

@@ -1,8 +1,8 @@
 import { isAsync, deepEquals } from '../util';
 
 export default class Luna {
-    constructor() {
-        this.timeout = 5000;
+    constructor({ timeout = 5 } = {}) {
+        this.timeout = timeout * 1000;
         this.results = [];
         this.running = -1;
     }

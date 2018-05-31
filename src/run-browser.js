@@ -4,7 +4,9 @@ import * as tests from 'TEST_FILE_PATH';
 import Luna from './classes/Luna';
 
 async function runAll() {
-    const luna = new Luna();
+    const luna = new Luna({
+        timeout: 'TEST_TIMEOUT'
+    });
     await luna.runAll(tests);
     const done = document.createElement('div');
     done.classList.add('done');

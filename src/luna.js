@@ -20,6 +20,7 @@ function showUsage(message) {
     console.log('-h, --help             Show usage');
     console.log('-n, --node             Run unit tests from node environment instead of a browser');
     console.log('-p, --port             Port to run webserver on (default: 5862)');
+    console.log('-t, --timeout          Maximum amount of time in seconds to wait for async tests to run (default: 5)');
     console.log('-v, --verbose          Show verbose output when tests run');
     console.log('--version              Show version');
 
@@ -37,6 +38,7 @@ const argv = yargs
     .alias('n', 'node')
     .alias('l', 'coverage')
     .alias('p', 'port')
+    .alias('t', 'timeout')
     .help('').argv;
 
 if (argv.help) {
@@ -70,7 +72,8 @@ const options = {
     verbose: argv.verbose,
     node: argv.node,
     singleRun: argv['single-run'],
-    fastFail: argv['fast-fail']
+    fastFail: argv['fast-fail'],
+    timeout: argv.timeout || 5
 };
 
 // Force verbose mode from a CI environment

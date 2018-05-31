@@ -75,7 +75,7 @@ export async function singleRun(options) {
     }
 
     const testPath = options.paths[0];
-    const code = await getBundle(testPath, true, options.coverage);
+    const code = await getBundle(testPath, options);
     const tests = requireFromString(code, '');
     return tests.run();
 }
@@ -127,7 +127,7 @@ function groupLines(string) {
 async function runTestNode(testPath, options) {
     return new Promise((resolve, reject) => {
         // console.log('runTestNode', testPath, options);
-        const args = [testPath, '--node', '--single-run'];
+        const args = [testPath, '--node', '--single-run', '--timeout', options.timeout];
         if (options.coverage) {
             args.push('--coverage');
         }
