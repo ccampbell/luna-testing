@@ -172,8 +172,8 @@ async function runTestBrowser(browser, testPath, options) {
                     // and response.json() do not work. So I am including the
                     // error in a header
                     const headers = response.headers();
-                    await page.close();
                     reject(JSON.parse(headers.error));
+                    await page.close();
                 }
             });
 
