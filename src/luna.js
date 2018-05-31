@@ -21,7 +21,7 @@ function showUsage(message) {
     console.log('-h, --help             Show usage');
     console.log('-n, --node             Run unit tests from node environment instead of a browser');
     console.log('-p, --port             Port to run webserver on (default: 5862)');
-    console.log('-t, --timeout          Maximum amount of time in seconds to wait for async tests to run (default: 5)');
+    console.log('-t, --timeout          Maximum time in seconds to wait for async tests to complete (default: 5)');
     console.log('-v, --verbose          Show verbose output when tests run');
     console.log('--version              Show version');
 
