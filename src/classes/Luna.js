@@ -1,4 +1,4 @@
-import { isAsync, deepEquals } from '../util';
+import { isAsync, deepEquals, PREFIX } from '../util';
 
 export default class Luna {
     constructor({ timeout = 5 } = {}) {
@@ -12,7 +12,7 @@ export default class Luna {
     }
 
     async run(testName, test) {
-        this._log('Running', testName);
+        this._log(PREFIX.running, testName);
 
         const count = this.results.push({
             name: testName,
@@ -83,13 +83,13 @@ export default class Luna {
 
             try {
                 await this.run(testName, tests[testName]);
-                this._log('Finished', testName, this.results[this.running].failures);
+                this._log(PREFIX.finished, testName, this.results[this.running].failures);
             } catch (e) {
                 this._fail(e);
-                this._log('Finished', testName, 1);
+                this._log(PREFIX.finished, testName, 1);
             }
         }
 
-        this._log('Results', JSON.stringify(this.results));
+        this._log(PREFIX.results, JSON.stringify(this.results));
     }
 }

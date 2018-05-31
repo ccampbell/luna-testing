@@ -1,5 +1,6 @@
 import { runTests, singleRun } from './runner';
 import chalk from 'chalk';
+import { PREFIX } from './util';
 const fs = require('fs');
 const yargs = require('yargs');
 const version = require('./../package.json').version;
@@ -91,7 +92,7 @@ if (ci.isCI) {
             let fileName;
             if (options.coverage) {
                 fileName = `/tmp/coverage-${process.pid}.json`;
-                console.log('Coverage', fileName);
+                console.log(PREFIX.coverage, fileName);
             }
 
             await singleRun(options);

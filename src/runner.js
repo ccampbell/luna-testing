@@ -1,6 +1,6 @@
 // This is the runner that runs from node.js to execute the tests
 import { startServer, getBundle } from './server';
-import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, spaces } from './util';
+import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, spaces, PREFIX } from './util';
 import { syntaxHighlight } from './highlight';
 import { puppeteerToIstanbul } from './coverage';
 import Queue from './classes/Queue';
@@ -81,11 +81,11 @@ export async function singleRun(options) {
 }
 
 function handleMessage(message, testPath, options) {
-    if (/^Running/.test(message)) {
+    if (new RegExp(`^${PREFIX.running}`).test(message)) {
         return false;
     }
 
-    if (/^Finished/.test(message)) {
+    if (new RegExp(`^${PREFIX.finished}`).test(message)) {
         if (!options.verbose) {
             bar.tick();
             return false;
@@ -97,12 +97,12 @@ function handleMessage(message, testPath, options) {
         return false;
     }
 
-    if (/^Results/.test(message)) {
-        return JSON.parse(message.slice(8));
+    if (new RegExp(`^${PREFIX.results}`).test(message)) {
+        return JSON.parse(message.split(`${PREFIX.results} `)[1]);
     }
 
-    if (/^Coverage/.test(message)) {
-        const coverageFile = message.split('Coverage ')[1];
+    if (new RegExp(`^${PREFIX.coverage}`).test(message)) {
+        const coverageFile = message.split(`${PREFIX.coverage} `)[1];
         coveragePaths.push(coverageFile);
         return false;
     }
@@ -115,10 +115,10 @@ function handleMessage(message, testPath, options) {
 }
 
 function groupLines(string) {
-    const bits = string.split(/^Results/gm);
+    const bits = string.split(new RegExp(`^${PREFIX.results}`, 'gm'));
     const lines = bits[0].split('\n');
     if (bits[1]) {
-        lines.push(`Results ${bits[1]}`);
+        lines.push(`${PREFIX.results} ${bits[1]}`);
     }
 
     return lines;

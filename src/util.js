@@ -5,6 +5,14 @@ const commentLine = /\/\/(.*)/g;
 const commentMultiline = /\/\*([\s\S]*?)\*\//g;
 const escapedStringChars = /\\('|"|`)/g;
 
+// Prefixes for log communication messages
+export const PREFIX = {
+    running: '__LunaRunning__',
+    finished: '__LunaFinished__',
+    results: '__LunaResults__',
+    coverage: '__LunaCoverage__'
+};
+
 // @todo maybe use esprima for this
 export function extractFunctionNames(source) {
     source = source.replace(commentLine, '');
