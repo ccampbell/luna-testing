@@ -29,7 +29,7 @@ export async function getBundle(filePath, options) {
 
             if (options.node && options.coverage) {
                 plugins.push(coverage({
-                    exclude: [filePath]
+                    exclude: [filePath, 'node_modules/**']
                 }));
             }
 

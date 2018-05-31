@@ -80,10 +80,14 @@ async function resolveSourceMap(coverage, ignore) {
     const buf = Buffer.from(sourceMapString, 'base64');
     const sourceMapData = JSON.parse(buf.toString());
 
-    let remove = -1;
+    let remove = [];
     for (let i = 0; i < sourceMapData.sources.length; i++) {
         if (sourceMapData.sources[i].indexOf(ignore) > -1) {
-            remove = i;
+            remove.push(i);
+        }
+
+        if (sourceMapData.sources[i].indexOf('/node_modules/') > -1) {
+            remove.push(i);
         }
 
         newCoverage.push({
@@ -106,8 +110,9 @@ async function resolveSourceMap(coverage, ignore) {
 
     });
 
-    if (remove > -1) {
-        newCoverage.splice(remove, 1);
+    let i = remove.length;
+    while (i--) {
+        newCoverage.splice(remove[i], 1);
     }
 
     return Promise.resolve(newCoverage);
