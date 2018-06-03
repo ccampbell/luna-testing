@@ -4,6 +4,10 @@ Luna is a simple, modern, opinionated unit testing framework for testing JavaScr
 
 Unlike other testing frameworks, Luna has no configuration options or plugins. This means it will not work for every use case, but it is designed to work very well in many cases.
 
+You can read the [introduction blog post]() to learn a bit more about the motivation for the project.
+
+---
+
 <!-- MarkdownTOC autolink="true" -->
 
 - [Getting Started](#getting-started)
@@ -19,6 +23,7 @@ Unlike other testing frameworks, Luna has no configuration options or plugins. T
 - [Runtime](#runtime)
     - [Concurrency](#concurrency)
     - [Code Coverage](#code-coverage)
+    - [Limitations](#limitations)
 - [Testing Luna](#testing-luna)
 
 <!-- /MarkdownTOC -->
@@ -65,13 +70,13 @@ Luna was partially inspired by the way testing works in golang where it is built
 
 Luna makes some assumptions about how your projects and tests should be written. This means it is not going to be a magical tool that works for everybody, but assuming you follow a few best-practices, Luna will stay out of your way and become invisible.
 
-- Tests need to be written as ES6 modules
+- **Tests need to be written as ES6 modules**
 
     This is required because of how Luna processes tests. A test runner module is created that imports * from each test file. It then runs each function with a name that begins with lowercase `test`. If a test function is not exported, it will not run.
 
     Your source code does not need to be ES6 modules, but it is easier if it is because then you can import specific functions to use with specific tests.
 
-- Your source could should not depend on code transpiling
+- **Your source could should not depend on code transpiling**
 
     Luna uses rollup to resolve the modules and bundle your tests into standalone JavaScript files to run. Unlike other testing frameworks where you have to juggle around a bunch of .babelrc files and configurations, or try out experimental node libraries, Luna does not touch your source code. It keeps everything as ES2017 JavaScript. This means it will **not** work with CoffeeScript or TypeScript or other compile to JavaScript languages out of the box.
 
@@ -79,13 +84,13 @@ Luna makes some assumptions about how your projects and tests should be written.
 
     **_Note:_** *There is one exception to this which is that JSX **will** be transpiled into `React.createElement` syntax automatically. This is to make it possible to test React projects.*
 
-- Your tests will not be able to run in older browsers
+- **Your tests will not be able to run in older browsers**
 
     This will probably be a deal breaker for a number of projects, but Luna is designed with modern code execution in mind. When running in a browser, it only is able to run in new versions of Chromium. This is a trade-off for making browser access completely painless.
 
     In theory, it should be possible to get it to work in other browser testing environments, but it is not high on the priority list.
 
-- You do not need any fancy testing features
+- **You do not need any fancy testing features**
 
     Out of the box Luna does not have any mocking, monkey patching, setup, teardown, fixture, function wrapping, or other advanced testing capabilities. It does not pollute or clutter the global namespace with a bunch of random variables. In fact, Luna only supports a single `assert` function for test assertions.
 
@@ -93,7 +98,7 @@ Luna makes some assumptions about how your projects and tests should be written.
 
     If you have a use case that is not supported, but you think should be, feel free to [open an issue](https://github.com/ccampbell/luna/issues).
 
-- Your tests need to reference the assert method as `t.assert`
+- **Your tests need to reference the assert method as `t.assert`**
 
     Each test that you export gets passed a `Luna` object when it is called. This object contains a single public method `assert`. Luna contains a custom assert function inspired by power-assert which actually rewrites `t.assert` functions in your tests in order to provide better output. For example if your assertion looks like this:
 
@@ -263,6 +268,10 @@ Code coverage is tracked and reported automatically after running your tests. In
 When running via the browser it uses the puppeteer JS coverage reporting methods. Unfortunately, they do not seem to match exactly with what istanbul reports, but it is will still give you a pretty good idea. The puppeteer coverage output also [does not support source maps](https://github.com/GoogleChrome/puppeteer/issues/985) so Luna has to do a bunch of work to apply the source maps and then transform it into a format that can be consumed by the istanbul API for actually reporting the coverage.
 
 **_NOTE:_** *The branches and statements coverage reports seem to always return 100% when using browser coverage. This is most likely related to the translation from puppeteer to v8 and istanbul coverage formats.*
+
+### Limitations
+
+According to the [puppeteer documentation](https://github.com/GoogleChrome/puppeteer#q-what-features-does-puppeteer-not-support) there may be issues with regards to certain audio and video formats such as AAC and H.264 since Chromium does not contain the licenses to play them back. Also features specific to Chrome mobile will not work.
 
 ## Testing Luna
 
