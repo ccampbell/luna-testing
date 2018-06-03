@@ -2,8 +2,9 @@
 import { startServer, getBundle } from './server';
 import { extractFunctionNames, formatLine, getElapsedTime, looksTheSame, spaces, PREFIX } from './util';
 import { syntaxHighlight } from './highlight';
-import { puppeteerToIstanbul, applySourceMapToTrace } from './coverage';
+import { applySourceMapToTrace } from './coverage';
 import Queue from './classes/Queue';
+import PuppeteerCoverage from './classes/PuppeteerCoverage';
 import ProgressBar from 'progress';
 import chalk from 'chalk';
 
@@ -18,6 +19,7 @@ let bar;
 let sourceMapError = null;
 const logs = [];
 const map = istanbul.createCoverageMap();
+const puppeteerCoverage = new PuppeteerCoverage();
 const coveragePaths = [];
 
 function getTestCount(path) {
@@ -187,12 +189,12 @@ async function runTestBrowser(browser, testPath, options) {
             await page.goto(url, { timeout: 5000 });
             await page.waitForSelector('.done');
 
+            let jsCoverage;
             if (options.coverage) {
-                const jsCoverage = await page.coverage.stopJSCoverage();
+                jsCoverage = await page.coverage.stopJSCoverage();
 
                 try {
-                    const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
-                    map.merge(istanbulCoverage);
+                    await puppeteerCoverage.add(jsCoverage, testPath);
                 } catch (e) {
                     sourceMapError = e;
                 }
@@ -202,7 +204,9 @@ async function runTestBrowser(browser, testPath, options) {
                 if (results[i].trace) {
                     try {
                         results[i].trace = await applySourceMapToTrace(results[i].trace, jsCoverage);
-                    } catch (e) {}
+                    } catch (e) {
+                        // Ignore
+                    }
                 }
             }
 
@@ -345,7 +349,7 @@ function logCoverage(options) {
     }
 
     if (sourceMapError !== null) {
-        console.log('⚠️  Error generating sourcemaps')
+        console.log('⚠️  Error generating sourcemaps');
         console.log(sourceMapError);
         return;
     }
@@ -353,6 +357,10 @@ function logCoverage(options) {
     for (const path of coveragePaths) {
         const coverage = fs.readFileSync(path);
         map.merge(JSON.parse(coverage));
+    }
+
+    if (!options.node) {
+        map.merge(puppeteerCoverage.toIstanbul());
     }
 
     // This is how to get the complete list of uncovered lines

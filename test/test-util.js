@@ -7,7 +7,8 @@ import {
     getElapsedTime,
     isAsync,
     looksTheSame,
-    spaces
+    spaces,
+    combineRanges
 } from '../src/util';
 
 export function testExtractFunctionNames(t) {
@@ -127,4 +128,38 @@ export function testFindPositionForLineAndColumn(t) {
 
     const position2 = findPositionForLineAndColumn(someCode, {line: 1, column: 0});
     t.assert(position2 === 0);
+}
+
+export function testCombineRanges(t) {
+    let range1 = [
+        { start: 5, end: 10 },
+        { start: 20, end: 100 },
+        { start: 200, end: 500 }
+    ];
+
+    let range2 = [
+        { start: 0, end: 7 },
+        { start: 13, end: 17 },
+        { start: 99, end: 600 }
+    ];
+
+    let newRanges = combineRanges(range1, range2);
+    let expected = [
+        { start: 0, end: 10 },
+        { start: 13, end: 17 },
+        { start: 20, end: 600 }
+    ];
+
+    t.assert(newRanges == expected);
+
+    let range3 = [
+        { start: 7, end: 1000 }
+    ];
+
+    expected = [
+        { start: 5, end: 1000 }
+    ];
+
+    newRanges = combineRanges(range1, range3);
+    t.assert(newRanges == expected);
 }

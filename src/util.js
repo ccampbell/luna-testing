@@ -146,3 +146,24 @@ export function findPositionForLineAndColumn(code, { line = 0, column = 0 } = {}
     position += column;
     return position;
 }
+
+// @see https://stackoverflow.com/a/26391774/421333
+export function combineRanges(ranges1, ranges2) {
+    const ranges = ranges1.concat(ranges2);
+    ranges.sort((a, b) => a.start - b.start || a.end - b.end);
+
+    const result = [];
+    let last;
+    for (const r of ranges) {
+        if (!last || r.start > last.end) {
+            result.push(last = r);
+            continue;
+        }
+
+        if (r.end > last.end) {
+            last.end = r.end;
+        }
+    }
+
+    return result;
+}

@@ -1,7 +1,6 @@
 import { findLineAndColumnForPosition, findPositionForLineAndColumn } from './util';
 
 const sourceMap = require('source-map');
-const v8toIstanbul = require('v8-to-istanbul');
 
 function addRangeToCoverage(newCoverage, sources, start, end) {
     const index = sources.indexOf(start.source);
@@ -67,7 +66,7 @@ function getSourceMapData(coverage) {
     return JSON.parse(buf.toString());
 }
 
-async function resolveSourceMap(coverage, ignore) {
+export async function resolveSourceMap(coverage, ignore) {
     // Should return an array like
     // [{
     //     url: "filePath",
@@ -82,7 +81,7 @@ async function resolveSourceMap(coverage, ignore) {
     const newCoverage = [];
     const sourceMapData = getSourceMapData(coverage);
 
-    let remove = [];
+    const remove = [];
     for (let i = 0; i < sourceMapData.sources.length; i++) {
         if (sourceMapData.sources[i].indexOf(ignore) > -1) {
             remove.push(i);
@@ -120,44 +119,6 @@ async function resolveSourceMap(coverage, ignore) {
     return Promise.resolve(newCoverage);
 }
 
-function convertRange(range) {
-    return {
-        startOffset: range.start,
-        endOffset: range.end,
-        count: 1
-    };
-}
-
-// partially borrowed from
-// https://github.com/istanbuljs/puppeteer-to-istanbul
-function convertToV8(coverage) {
-    let id = 0;
-
-    return coverage.map((item) => ({
-        scriptId: id++,
-        url: `file://${item.url}`,
-        functions: [{
-            ranges: item.ranges.map(convertRange),
-            isBlockCoverage: true
-        }]
-    }));
-}
-
-function convertToIstanbul(coverage) {
-    const fullJson = {};
-    coverage.forEach((jsFile) => {
-        const script = v8toIstanbul(jsFile.url);
-        script.applyCoverage(jsFile.functions);
-
-        const istanbulCoverage = script.toIstanbul();
-        const keys = Object.keys(istanbulCoverage);
-
-        fullJson[keys[0]] = istanbulCoverage[keys[0]];
-    });
-
-    return fullJson;
-}
-
 function applySourceMapToLine(line, consumer) {
     return line.replace(/\(.*?\)$/, (match) => {
         const matchBits = match.split(':');
@@ -178,7 +139,7 @@ function applySourceMapToLine(line, consumer) {
 
 export async function applySourceMapToTrace(trace, coverage) {
     const sourceMapData = getSourceMapData(coverage[0]);
-    let lines = trace.split('\n');
+    const lines = trace.split('\n');
     await sourceMap.SourceMapConsumer.with(sourceMapData, null, (consumer) => {
         for (let i = 0; i < lines.length; i++) {
             lines[i] = applySourceMapToLine(lines[i], consumer);
@@ -186,26 +147,4 @@ export async function applySourceMapToTrace(trace, coverage) {
     });
 
     return lines.join('\n');
-}
-
-export async function puppeteerToIstanbul(coverage, ignore) {
-    return new Promise(async(resolve, reject) => {
-        if (coverage.length === 0) {
-            resolve(coverage);
-            return;
-        }
-
-        coverage = coverage[0];
-        let sourceMapCoverage;
-        try {
-            sourceMapCoverage = await resolveSourceMap(coverage, ignore);
-        } catch (e) {
-            reject(e);
-            return;
-        }
-
-        const v8Coverage = convertToV8(sourceMapCoverage);
-        const istanbulCoverage = convertToIstanbul(v8Coverage);
-        resolve(istanbulCoverage);
-    });
 }
