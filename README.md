@@ -127,13 +127,13 @@ Even though Luna does not support any configuration options via a config file, i
 
 | Flag | Name | Description | Default |
 |  :--- | :--- | :--- | :--- |
-| <pre>`-c, --concurrency`</pre> | Concurrency | The number of test files that should be executed in parallel. This is useful if you have long running tests and you do not want to hold up the entire test bundle. | 1 (no concurrency) |
-| <pre>`-l, --coverage`</pre> | Coverage | Show code coverage to see how many lines were executed as part of running your tests | false |
-| <pre>`-f, --fast-fail`</pre> | Fast fail | By default all tests running and all failures will show at the end. This flag makes it so that after a test failure, execution stops immediately. | false |
-| <pre>`-h, --help`</pre> | Help | Shows help output | n/a |
 | <pre>`-n, --node`</pre> | Node | Run tests in node environment instead of in a browser | false |
-| <pre>`-p, --port`</pre> | Port | The port to use for the webserver that is used to serve js files to the browser | 5862 |
+| <pre>`-c, --concurrency`</pre> | Concurrency | The number of test files that should be executed in parallel. This is useful if you have long running tests and you do not want to hold up the entire test bundle. | 1 (no concurrency) |
+| <pre>`-f, --fast-fail`</pre> | Fast fail | By default all tests running and all failures will show at the end. This flag makes it so that after a test failure, execution stops immediately. | false |
+| <pre>`-x, --no-coverage`</pre> | No Coverage | Disables code coverage reporting. Could speed up test execution. | false |
 | <pre>`-t, --timeout`</pre> | Timeout | The amount of time in seconds to wait for asynchronous functions to complete | 5 |
+| <pre>`-p, --port`</pre> | Port | The port to use for the webserver that is used to serve js files to the browser | 5862 |
+| <pre>`-h, --help`</pre> | Help | Shows help output | n/a |
 | <pre>`-v, --verbose`</pre> | Verbose | Show verbose output. This lists the result of each test as it completes. Verbose mode is triggered automatically when running from a continuous integration service such as travis. | false |
 
 ## Defining tests
@@ -258,9 +258,11 @@ It uses a backpressure queue to limit the maximum number of tests that can run a
 
 ### Code Coverage
 
-Code coverage is reported if you pass the `--coverage` argument when running your tests. In node it uses [istanbul](https://istanbul.js.org/) to instrument your code and then displays a coverage report to your shell. It also creates a `coverage` directory in the root of your project which contains an HTML page you can view in your browser to see the code coverage on a file by file basis.
+Code coverage is tracked and reported automatically after running your tests. In node it uses [istanbul](https://istanbul.js.org/) to instrument your code and then displays a coverage summary to your shell. It will show a text breakdown of the file by file coverage if you are running with the verbose flag. It also creates a `coverage` directory in the root of your project which contains an HTML page you can view in your browser to see the code coverage overlayed on top of the original source code.
 
 When running via the browser it uses the puppeteer JS coverage reporting methods. Unfortunately, they do not seem to match exactly with what istanbul reports, but it is will still give you a pretty good idea. The puppeteer coverage output also [does not support source maps](https://github.com/GoogleChrome/puppeteer/issues/985) so Luna has to do a bunch of work to apply the source maps and then transform it into a format that can be consumed by the istanbul API for actually reporting the coverage.
+
+**_NOTE:_** *The branches and statements coverage reports seem to always return 100% when using browser coverage. This is most likely related to the translation from puppeteer to v8 and istanbul coverage formats.*
 
 ## Testing Luna
 
