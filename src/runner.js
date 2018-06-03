@@ -157,7 +157,9 @@ async function runTestBrowser(browser, testPath, options) {
         try {
             const page = await browser.newPage();
 
-            await page.coverage.startJSCoverage();
+            if (options.coverage) {
+                await page.coverage.startJSCoverage();
+            }
 
             const url = `http://localhost:${options.port}/run/${testPath}`;
             let results = {};
@@ -185,13 +187,15 @@ async function runTestBrowser(browser, testPath, options) {
             await page.goto(url, { timeout: 5000 });
             await page.waitForSelector('.done');
 
-            const jsCoverage = await page.coverage.stopJSCoverage();
+            if (options.coverage) {
+                const jsCoverage = await page.coverage.stopJSCoverage();
 
-            try {
-                const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
-                map.merge(istanbulCoverage);
-            } catch (e) {
-                sourceMapError = e;
+                try {
+                    const istanbulCoverage = await puppeteerToIstanbul(jsCoverage, testPath);
+                    map.merge(istanbulCoverage);
+                } catch (e) {
+                    sourceMapError = e;
+                }
             }
 
             for (let i = 0; i < results.length; i++) {
@@ -335,7 +339,11 @@ function logLogs(exitCode) {
     console.log('');
 }
 
-function logCoverage() {
+function logCoverage(options) {
+    if (!options.coverage) {
+        return;
+    }
+
     if (sourceMapError !== null) {
         console.log('⚠️  Error generating sourcemaps')
         console.log(sourceMapError);
@@ -354,10 +362,15 @@ function logCoverage() {
     // });
 
     const reporter = createReporter();
-    reporter.addAll(['lcov', 'text', 'text-summary']);
+    const reportersToUse = ['lcov', 'text-summary'];
+    if (options.verbose) {
+        console.log('');
+        reportersToUse.splice(1, 0, 'text');
+    }
+    reporter.addAll(reportersToUse);
     reporter.write(map);
 
-    console.log(`💾  HTML coverage report available at ${chalk.bold.underline('coverage/lcov-report/index.html')}`);
+    console.log(`\n💾  HTML coverage report available at ${chalk.bold.underline('coverage/lcov-report/index.html')}`);
 }
 
 export async function runTests(options) {
@@ -431,10 +444,7 @@ export async function runTests(options) {
         const endTime = new Date().getTime();
 
         logLogs(exitCode);
-
-        if (options.coverage) {
-            logCoverage();
-        }
+        logCoverage(options);
 
         console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
 

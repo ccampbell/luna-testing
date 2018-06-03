@@ -10,20 +10,20 @@ function showUsage(message) {
     console.log([
         '            ',
         '     ,/   * ',
-        `  _,'/_   |        Luna v${version}`,
+        `  _,'/_   |          Luna v${version}`,
         '  \`(")\' ,\'/'].join('\n'));
     console.log('\n\x1B[1mUSAGE\x1B[0m');
     console.log('luna /path/to/tests');
     console.log('\n\x1B[1mOPTIONS\x1B[0m');
-    console.log('-c, --concurrency      Number of test files to run at a time (default: 1)');
-    console.log('-l, --coverage         Track and show code coverage');
-    console.log('-f, --fast-fail        Fail immediately after a test failure');
-    console.log('-h, --help             Show usage');
-    console.log('-n, --node             Run unit tests from node environment instead of a browser');
-    console.log('-p, --port             Port to run webserver on (default: 5862)');
-    console.log('-t, --timeout          Maximum time in seconds to wait for async tests to complete (default: 5)');
-    console.log('-v, --verbose          Show verbose output when tests run');
-    console.log('--version              Show version');
+    console.log('-n, --node           Run unit tests from node environment instead of a browser');
+    console.log('-c, --concurrency    Number of test files to run at a time (default: 1)');
+    console.log('-f, --fast-fail      Fail immediately after a test failure');
+    console.log('-x, --no-coverage    Disable code coverage');
+    console.log('-t, --timeout        Maximum time in seconds to wait for async tests to complete (default: 5)');
+    console.log('-p, --port           Port to run webserver on (default: 5862)');
+    console.log('-h, --help           Show usage');
+    console.log('-v, --verbose        Show verbose output when tests run');
+    console.log('--version            Show version');
 
     if (message) {
         console.log(`\n⚠️  ${chalk.bold(message)}`);
@@ -37,7 +37,7 @@ const argv = yargs
     .alias('c', 'concurrency')
     .alias('f', 'fast-fail')
     .alias('n', 'node')
-    .alias('l', 'coverage')
+    .alias('x', 'no-coverage')
     .alias('p', 'port')
     .alias('t', 'timeout')
     .help('').argv;
@@ -63,11 +63,10 @@ if (paths.length === 0) {
     showUsage('No files found at provided paths');
     process.exit(1);
 }
-
 const options = {
     paths,
     binary: argv.$0,
-    coverage: argv.coverage,
+    coverage: !argv.noCoverage,
     concurrency: argv.concurrency || 1,
     port: argv.port || 5862,
     verbose: argv.verbose,
