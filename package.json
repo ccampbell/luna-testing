@@ -8,7 +8,7 @@
   },
   "scripts": {
     "pretest": "npm run lint && npm run test_browser",
-    "test_browser": "bin/luna.js test/test-luna.js",
+    "test_browser": "bin/luna.js test/test-luna.js -x",
     "test": "bin/luna.js test -n",
     "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna.js -f cjs --banner \"#!/usr/bin/env node\n// v$npm_package_version\"",
     "lint": "eslint src",
