@@ -2,7 +2,6 @@
   "name": "luna-testing",
   "version": "1.0.0",
   "description": "A simple, modern, opinionated unit testing framework",
-  "main": "src/luna.js",
   "bin": {
     "luna": "./bin/luna.js"
   },
