@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.0.0 */
+/* Luna v1.0.1 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -1283,6 +1283,7 @@ if (paths.length === 0) {
     showUsage('No files found at provided paths');
     process.exit(1);
 }
+
 const options = {
     paths,
     binary: argv.$0,
@@ -1309,7 +1310,8 @@ if (ci.isCI) {
             //
             // @see https://github.com/nodejs/node/issues/19218
             let fileName;
-            if (options.coverage) {
+            const hasCoverage = options.coverage && typeof __coverage__ !== 'undefined';
+            if (hasCoverage) {
                 fileName = `/tmp/coverage-${process.pid}.json`;
                 console.log(PREFIX.coverage, fileName);
             }
@@ -1317,7 +1319,7 @@ if (ci.isCI) {
             await singleRun(options);
 
             /* global __coverage__ */
-            if (options.coverage) {
+            if (hasCoverage) {
                 fs$2.writeFileSync(fileName, JSON.stringify(__coverage__));
             }
             process.exit(0);
