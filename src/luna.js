@@ -63,6 +63,7 @@ if (paths.length === 0) {
     showUsage('No files found at provided paths');
     process.exit(1);
 }
+
 const options = {
     paths,
     binary: argv.$0,
