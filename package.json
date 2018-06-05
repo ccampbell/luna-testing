@@ -14,7 +14,7 @@
     "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna.js -f cjs --banner \"#!/usr/bin/env node\n/* Luna v$npm_package_version */\"",
     "lint": "eslint src",
     "preversion": "npm test",
-    "version": "npm run build"
+    "version": "npm run build && git add bin/luna.js"
   },
   "keywords": [
     "unit",
