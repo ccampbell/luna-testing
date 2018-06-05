@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.0.1 */
+/* Luna v1.0.2 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -1079,9 +1079,13 @@ function logCoverage(options) {
     }
 
     for (const path of coveragePaths) {
-        const coverage = fs$1.readFileSync(path);
-        fs$1.unlinkSync(path);
-        map.merge(JSON.parse(coverage));
+        try {
+            const coverage = fs$1.readFileSync(path);
+            fs$1.unlinkSync(path);
+            map.merge(JSON.parse(coverage));
+        } catch (e) {
+            // Empty
+        }
     }
 
     if (!options.node) {
@@ -1310,7 +1314,7 @@ if (ci.isCI) {
             //
             // @see https://github.com/nodejs/node/issues/19218
             let fileName;
-            const hasCoverage = options.coverage && typeof __coverage__ !== 'undefined';
+            const hasCoverage = options.coverage;
             if (hasCoverage) {
                 fileName = `/tmp/coverage-${process.pid}.json`;
                 console.log(PREFIX.coverage, fileName);
@@ -1319,7 +1323,7 @@ if (ci.isCI) {
             await singleRun(options);
 
             /* global __coverage__ */
-            if (hasCoverage) {
+            if (hasCoverage && typeof __coverage__ !== 'undefined') {
                 fs$2.writeFileSync(fileName, JSON.stringify(__coverage__));
             }
             process.exit(0);
