@@ -75,6 +75,8 @@ function getReplacement(assertCode, file, position, index) {
 }
 
 export function transform(code, id) {
+    // @todo this should use whatever variable is passed into the test function
+    // instead of looking explicitly for `t.assert()` calls
     const re = /((?:\/\/|\/\*|['"`])\s*)?\bt\.assert\(.*?\);?(?=\n)/g;
     let match;
     let start;
