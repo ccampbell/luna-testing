@@ -90,7 +90,8 @@ if (ci.isCI) {
             //
             // @see https://github.com/nodejs/node/issues/19218
             let fileName;
-            if (options.coverage) {
+            const hasCoverage = options.coverage && typeof __coverage__ !== 'undefined';
+            if (hasCoverage) {
                 fileName = `/tmp/coverage-${process.pid}.json`;
                 console.log(PREFIX.coverage, fileName);
             }
@@ -98,7 +99,7 @@ if (ci.isCI) {
             await singleRun(options);
 
             /* global __coverage__ */
-            if (options.coverage) {
+            if (hasCoverage) {
                 fs.writeFileSync(fileName, JSON.stringify(__coverage__));
             }
             process.exit(0);
