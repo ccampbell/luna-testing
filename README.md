@@ -4,7 +4,7 @@ Luna is a simple, modern, opinionated unit testing framework for testing JavaScr
 
 Unlike other testing frameworks, Luna has no configuration options or plugins. This means it will not work for every use case, but it is designed to work very well in many cases.
 
-You can read the [introduction blog post]() to learn a bit more about the motivation for the project.
+You can read the [introduction blog post](https://medium.com/@craigiam/introducing-luna-javascript-testing-done-right-437a738cc1ed) to learn a bit more about the motivation for the project.
 
 ---
 
