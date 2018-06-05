@@ -355,9 +355,13 @@ function logCoverage(options) {
     }
 
     for (const path of coveragePaths) {
-        const coverage = fs.readFileSync(path);
-        fs.unlinkSync(path);
-        map.merge(JSON.parse(coverage));
+        try {
+            const coverage = fs.readFileSync(path);
+            fs.unlinkSync(path);
+            map.merge(JSON.parse(coverage));
+        } catch (e) {
+            // Empty
+        }
     }
 
     if (!options.node) {
