@@ -356,6 +356,7 @@ function logCoverage(options) {
 
     for (const path of coveragePaths) {
         const coverage = fs.readFileSync(path);
+        fs.unlinkSync(path);
         map.merge(JSON.parse(coverage));
     }
 
