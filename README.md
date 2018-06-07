@@ -76,7 +76,7 @@ Luna makes some assumptions about how your projects and tests should be written.
 
     Your source code does not need to be ES6 modules, but it is easier if it is because then you can import specific functions to use with specific tests.
 
-- **Your source could should not depend on code transpiling**
+- **Your source should not depend on code transpiling**
 
     Luna uses rollup to resolve the modules and bundle your tests into standalone JavaScript files to run. Unlike other testing frameworks where you have to juggle around a bunch of .babelrc files and configurations, or try out experimental node libraries, Luna does not touch your source code. It keeps everything as ES2017 JavaScript. This means it will **not** work with CoffeeScript or TypeScript or other compile to JavaScript languages out of the box.
 
