@@ -15,7 +15,7 @@ export async function getBundle(filePath, options) {
         try {
             const plugins = [
                 replace({
-                    TEST_FILE_PATH: `${process.cwd()}/${filePath}`,
+                    TEST_FILE_PATH: path.join(process.cwd(), filePath),
                     TEST_TIMEOUT: options.timeout
                 }),
                 buble({
