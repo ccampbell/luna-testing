@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.0.2 */
+/* Luna v1.0.3 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -282,7 +282,7 @@ async function getBundle(filePath, options) {
         try {
             const plugins = [
                 replace({
-                    TEST_FILE_PATH: `${process.cwd()}/${filePath}`,
+                    TEST_FILE_PATH: path.join(process.cwd(), filePath),
                     TEST_TIMEOUT: options.timeout
                 }),
                 buble({
