@@ -11,6 +11,7 @@ You can read the [introduction blog post](https://medium.com/@craigiam/introduci
 <!-- MarkdownTOC autolink="true" -->
 
 - [Getting Started](#getting-started)
+    - [Naming tests](#naming-tests)
     - [Specifying multiple test paths](#specifying-multiple-test-paths)
 - [Assumptions](#assumptions)
 - [Command line options](#command-line-options)
@@ -53,6 +54,24 @@ It’s as easy as 1, 2, 3…
     ```shell
     npx luna test/test-something.js
     ```
+
+### Naming tests
+
+Test functions *have* to start with the word `test` in lowercase. For example this will run:
+
+```javascript
+export function testSomething(t) {
+    t.assert(true);
+}
+```
+
+But this will **not**:
+
+```javascript
+export function somethingTest(t) {
+    t.assert(true);
+}
+```
 
 ### Specifying multiple test paths
 
