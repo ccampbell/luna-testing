@@ -13,9 +13,14 @@ let runOptions;
 export async function getBundle(filePath, options) {
     return new Promise(async(resolve, reject) => {
         try {
+            // This is somewhat confusing, but on Windows since this is a
+            // straight string replacement any path that has \test\something in
+            // it will end up rendering the \t as a tab characters. We have to
+            // make sure that any \ are replaced with \\
+            const fullTestPath = path.join(process.cwd(), filePath).replace(/\\/g, '\\\\');
             const plugins = [
                 replace({
-                    TEST_FILE_PATH: path.join(process.cwd(), filePath),
+                    TEST_FILE_PATH: fullTestPath,
                     TEST_TIMEOUT: options.timeout
                 }),
                 buble({
