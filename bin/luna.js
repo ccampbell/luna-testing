@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.0.4 */
+/* Luna v1.0.5 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -222,7 +222,7 @@ function getReplacement(assertCode, file, position, index) {
 function transform(code, id) {
     // @todo this should use whatever variable is passed into the test function
     // instead of looking explicitly for `t.assert()` calls
-    const re = /((?:\/\/|\/\*|['"`])\s*)?\bt\.assert\(.*?\);?(?=\n)/g;
+    const re = /((?:\/\/|\/\*|['"`])\s*)?\bt\.assert\(.*?\);?(?=\r?\n)/g;
     let match;
     let start;
     let end;
