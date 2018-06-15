@@ -3,6 +3,8 @@ import chalk from 'chalk';
 import { PREFIX } from './util';
 const fs = require('fs');
 const yargs = require('yargs');
+const os = require('os');
+const path = require('path');
 const version = require('./../package.json').version;
 const ci = require('ci-info');
 
@@ -92,7 +94,7 @@ if (ci.isCI) {
             let fileName;
             const hasCoverage = options.coverage;
             if (hasCoverage) {
-                fileName = `/tmp/coverage-${process.pid}.json`;
+                fileName = path.join(os.tmpdir(), `coverage-${process.pid}.json`);
                 console.log(PREFIX.coverage, fileName);
             }
 
