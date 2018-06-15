@@ -134,8 +134,18 @@ async function runTestNode(testPath, options) {
         if (!options.coverage) {
             args.push('-x');
         }
-        const test = spawn(options.binary, args);
 
+        // On Mac and Linux the path to the executable is enough because it can
+        // resolve #!/usr/bin/env node to execute it, but on Windows that
+        // doesn’t work. Here we have to hardcode node as the command path and
+        // prepend the luna executable to the args.
+        const isWindows = process.platform === "win32";
+        const command = isWindows ? process.execPath : options.binary;
+        if (isWindows) {
+            args.unshift(options.binary);
+        }
+
+        const test = spawn(command, args);
         let results = {};
         test.stdout.on('data', (output) => {
             const lines = groupLines(output.toString());
