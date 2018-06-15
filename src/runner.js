@@ -131,8 +131,8 @@ async function runTestNode(testPath, options) {
     return new Promise((resolve, reject) => {
         // console.log('runTestNode', testPath, options);
         const args = [testPath, '--node', '--single-run', '--timeout', options.timeout];
-        if (options.coverage) {
-            args.push('--coverage');
+        if (!options.coverage) {
+            args.push('-x');
         }
         const test = spawn(options.binary, args);
 
