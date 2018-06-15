@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.0.3 */
+/* Luna v1.0.4 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -280,9 +280,14 @@ let runOptions;
 async function getBundle(filePath, options) {
     return new Promise(async(resolve, reject) => {
         try {
+            // This is somewhat confusing, but on Windows since this is a
+            // straight string replacement any path that has \test\something in
+            // it will end up rendering the \t as a tab characters. We have to
+            // make sure that any \ are replaced with \\
+            const fullTestPath = path.join(process.cwd(), filePath).replace(/\\/g, '\\\\');
             const plugins = [
                 replace({
-                    TEST_FILE_PATH: path.join(process.cwd(), filePath),
+                    TEST_FILE_PATH: fullTestPath,
                     TEST_TIMEOUT: options.timeout
                 }),
                 buble({
@@ -854,12 +859,17 @@ function groupLines(string$$1) {
 async function runTestNode(testPath, options) {
     return new Promise((resolve, reject) => {
         // console.log('runTestNode', testPath, options);
-        const args = [testPath, '--node', '--single-run', '--timeout', options.timeout];
-        if (options.coverage) {
-            args.push('--coverage');
-        }
-        const test = spawn(options.binary, args);
 
+        // On Mac and Linux the path to the executable is enough because it can
+        // resolve #!/usr/bin/env node to execute it, but on Windows that
+        // doesn’t work. Here we have to prepend the luna executable to the
+        // args.
+        const args = [options.binary, testPath, '--node', '--single-run', '--timeout', options.timeout];
+        if (!options.coverage) {
+            args.push('-x');
+        }
+
+        const test = spawn(process.execPath, args);
         let results = {};
         test.stdout.on('data', (output) => {
             const lines = groupLines(output.toString());
@@ -1227,6 +1237,8 @@ async function runTests(options) {
 
 const fs$2 = require('fs');
 const yargs = require('yargs');
+const os = require('os');
+const path$1 = require('path');
 const version = require('./../package.json').version;
 const ci = require('ci-info');
 
@@ -1316,7 +1328,7 @@ if (ci.isCI) {
             let fileName;
             const hasCoverage = options.coverage;
             if (hasCoverage) {
-                fileName = `/tmp/coverage-${process.pid}.json`;
+                fileName = path$1.join(os.tmpdir(), `coverage-${process.pid}.json`);
                 console.log(PREFIX.coverage, fileName);
             }
 
