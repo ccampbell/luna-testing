@@ -13,6 +13,7 @@ You can read the [introduction blog post](https://medium.com/@craigiam/introduci
 - [Getting Started](#getting-started)
     - [Naming tests](#naming-tests)
     - [Specifying multiple test paths](#specifying-multiple-test-paths)
+    - [Using with common js modules](#using-with-common-js-modules)
 - [Assumptions](#assumptions)
 - [Command line options](#command-line-options)
 - [Defining tests](#defining-tests)
@@ -25,6 +26,8 @@ You can read the [introduction blog post](https://medium.com/@craigiam/introduci
     - [Concurrency](#concurrency)
     - [Code Coverage](#code-coverage)
     - [Limitations](#limitations)
+        - [Browser](#browser)
+        - [Node](#node)
 - [Testing Luna](#testing-luna)
 
 <!-- /MarkdownTOC -->
@@ -82,6 +85,24 @@ You can specify a path to a single test file or a directory of files or a combin
 ```
 
 This would run any tests exported by any file within the `test/` directory or the `src/util.js` file.
+
+### Using with common js modules
+
+If you are testing node code that depends on common js modules then you can import them using require syntax in your test files as you usually would. For example if this is your src file:
+
+```javascript
+module.exports = {
+    namedExport: function() {}
+};
+```
+
+You could import it in your test file using:
+
+```javascript
+const { namedExport } = require('../path/to/src/file.js');
+```
+
+**_Note:_** *Code coverage will [not work properly](#node) when using common js modules with node*
 
 ## Assumptions
 
@@ -290,7 +311,13 @@ When running via the browser it uses the puppeteer JS coverage reporting methods
 
 ### Limitations
 
+#### Browser
+
 According to the [puppeteer documentation](https://github.com/GoogleChrome/puppeteer#q-what-features-does-puppeteer-not-support) there may be issues with regards to certain audio and video formats such as AAC and H.264 since Chromium does not contain the licenses to play them back. Also features specific to Chrome mobile will not work.
+
+#### Node
+
+Code coverage reporting will not work for node modules that are imported using common-js `require` syntax. This is due to the fact that the code coverage for node is done using a rollup plugin, and rollup currently only resolves imports and exports. See #7 for more information about this issue.
 
 ## Testing Luna
 
