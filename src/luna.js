@@ -66,6 +66,14 @@ if (paths.length === 0) {
     process.exit(1);
 }
 
+// yargv tries to be too smart and when you prefix a flag with --no-{flagName}
+// it automatically sets the result to {flagName}: false which was not what I
+// was expecting. This makes sure that if the flag is set to false the other
+// value comes in too.
+if (argv.coverage === false) {
+    argv.noCoverage = true;
+}
+
 const options = {
     paths,
     binary: argv.$0,
