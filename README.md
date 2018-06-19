@@ -28,6 +28,7 @@ You can read the [introduction blog post](https://medium.com/@craigiam/introduci
     - [Limitations](#limitations)
         - [Browser](#browser)
         - [Node](#node)
+            - [Possible Workaround](#possible-workaround)
 - [Testing Luna](#testing-luna)
 
 <!-- /MarkdownTOC -->
@@ -317,7 +318,27 @@ According to the [puppeteer documentation](https://github.com/GoogleChrome/puppe
 
 #### Node
 
-Code coverage reporting will not work for node modules that are imported using common-js `require` syntax. This is due to the fact that the code coverage for node is done using a rollup plugin, and rollup currently only resolves imports and exports. See #7 for more information about this issue.
+Code coverage reporting will not work for node modules that are imported using common-js `require` syntax. This is due to the fact that the code coverage for node is done using a rollup plugin, and rollup currently only resolves imports and exports. See [#7](https://github.com/ccampbell/luna/issues/7) for more information about this issue.
+
+##### Possible Workaround
+
+If you are using common js with node you may have some success by using [nyc](https://github.com/istanbuljs/nyc) to run the tests, but I have not tested it extensively. Instead of running
+
+```
+npx luna /path/to/tests --node
+```
+
+You could try installing nyc
+
+```
+npm install nyc
+```
+
+And then running
+
+```
+npx nyc luna /path/to/tests --node
+```
 
 ## Testing Luna
 
