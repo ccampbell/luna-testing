@@ -15,10 +15,10 @@ export const PREFIX = {
 
 // @todo maybe use esprima for this
 export function extractFunctionNames(source) {
-    source = source.replace(commentLine, '');
-    source = source.replace(commentMultiline, '');
     source = source.replace(escapedStringChars, '');
     source = source.replace(string, '__STRING__');
+    source = source.replace(commentLine, '');
+    source = source.replace(commentMultiline, '');
 
     const re = /export(?: async)?\s+function\s+(test.*?)\(/g;
     let match;

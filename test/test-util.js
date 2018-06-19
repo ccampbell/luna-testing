@@ -25,12 +25,24 @@ export function testString() {}\`;
 /*
 export function testInsideComment() {}
 */
+
+// Strings need to be pulled out before comments
+// get stripped cause URLs look like comments heh.
+export function testTrickyPart1() {
+    const str = 'http://example.com';
+}
+
+export function testTrickyPart2() {
+    const str = 'http://example.com';
+}
 `;
 
     const functionNames = extractFunctionNames(fakeCode);
-    t.assert(functionNames.length === 2);
+    t.assert(functionNames.length === 4);
     t.assert(functionNames[0] === 'testSomething');
     t.assert(functionNames[1] === 'testMoreThings');
+    t.assert(functionNames[2] === 'testTrickyPart1');
+    t.assert(functionNames[3] === 'testTrickyPart2');
 }
 
 export function testIsAsync(t) {
