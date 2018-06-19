@@ -19,6 +19,7 @@ let bar;
 let sourceMapError = null;
 const logs = [];
 const map = istanbul.createCoverageMap();
+const puppeteerObjectText = 'JSHandle@object';
 const puppeteerCoverage = new PuppeteerCoverage();
 const coveragePaths = [];
 
@@ -159,6 +160,21 @@ async function runTestNode(testPath, options) {
     });
 }
 
+async function formatLog(msg) {
+    return new Promise((resolve, reject) => {
+        const text = msg._text;
+        if (text === puppeteerObjectText) {
+            const objectData = msg._args[0]._remoteObject.preview;
+            msg._args[0].jsonValue().then((val) => {
+                resolve([text, objectData.description, val]);
+            });
+            return;
+        }
+
+        resolve(text);
+    });
+}
+
 async function runTestBrowser(browser, testPath, options) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -170,8 +186,12 @@ async function runTestBrowser(browser, testPath, options) {
 
             const url = `http://localhost:${options.port}/run/${testPath}`;
             let results = {};
-            page.on('console', (msg) => {
-                results = handleMessage(msg._text, testPath, options);
+            page.on('console', async(msg) => {
+                const newMsg = await formatLog(msg);
+                const resp = handleMessage(newMsg, testPath, options);
+                if (resp) {
+                    results = resp;
+                }
             });
 
             page.on('response', async(response) => {
@@ -343,6 +363,11 @@ function logLogs(exitCode) {
 
     console.log(chalk.bold.underline.blue('Console Logs\n'));
     for (const log of logs) {
+        if (typeof log === 'object' && log.constructor.name === 'Array' && log[0] === puppeteerObjectText) {
+            console.log(log[1], log[2]);
+            continue;
+        }
+
         console.log(log);
     }
     console.log('');
