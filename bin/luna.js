@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.0.5 */
+/* Luna v1.1.0 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -24,10 +24,10 @@ const PREFIX = {
 
 // @todo maybe use esprima for this
 function extractFunctionNames(source) {
-    source = source.replace(commentLine, '');
-    source = source.replace(commentMultiline, '');
     source = source.replace(escapedStringChars, '');
     source = source.replace(string, '__STRING__');
+    source = source.replace(commentLine, '');
+    source = source.replace(commentMultiline, '');
 
     const re = /export(?: async)?\s+function\s+(test.*?)\(/g;
     let match;
@@ -350,7 +350,16 @@ async function bundleHandler(req, res) {
 function runHandler(req, res) {
     const filePath = req.params[0];
     const bundlePath = `/bundle/${filePath}`;
-    res.status(200).send(`<!DOCTYPE html><head><title>${filePath} – Test Runner</title></head><body><script src="${bundlePath}"></script></body>`);
+
+    let inject = '';
+    if (runOptions.inject) {
+        const extra = runOptions.inject.split(',');
+        for (const script of extra) {
+            inject += `<script src="/static/${script}"></script>`;
+        }
+    }
+
+    res.status(200).send(`<!DOCTYPE html><head><title>${filePath} – Test Runner</title></head><body>${inject}<script src="${bundlePath}"></script></body>`);
 }
 
 async function startServer(options) {
@@ -359,6 +368,8 @@ async function startServer(options) {
     const app = express();
     app.get(/\/bundle\/(.*)/, bundleHandler);
     app.get(/\/run\/(.*)/, runHandler);
+    app.use('/static', express.static(process.cwd()));
+
     return app.listen(options.port, () => {
         if (options.verbose) {
             console.log(`🔌  Server started at ${chalk.bold(`http://localhost:${options.port}`)}…`);
@@ -470,11 +481,21 @@ async function resolveSourceMap(coverage, ignore) {
     //     text: "fileContents"
     // }]
     const newCoverage = [];
-    const sourceMapData = getSourceMapData(coverage);
+    let sourceMapData;
+    try {
+        sourceMapData = getSourceMapData(coverage);
+    } catch (e) {
+        return Promise.resolve(newCoverage);
+    }
 
     const remove = [];
     for (let i = 0; i < sourceMapData.sources.length; i++) {
         if (sourceMapData.sources[i].indexOf(ignore) > -1) {
+            remove.push(i);
+        }
+
+        // hardcoded static files
+        if (sourceMapData.sources[i].indexOf('/static/') > -1) {
             remove.push(i);
         }
 
@@ -748,6 +769,7 @@ let bar;
 let sourceMapError = null;
 const logs = [];
 const map = istanbul.createCoverageMap();
+const puppeteerObjectText = 'JSHandle@object';
 const puppeteerCoverage = new PuppeteerCoverage();
 const coveragePaths = [];
 
@@ -888,6 +910,21 @@ async function runTestNode(testPath, options) {
     });
 }
 
+async function formatLog(msg) {
+    return new Promise((resolve, reject) => {
+        const text = msg._text;
+        if (text === puppeteerObjectText) {
+            const objectData = msg._args[0]._remoteObject.preview;
+            msg._args[0].jsonValue().then((val) => {
+                resolve([text, objectData.description, val]);
+            });
+            return;
+        }
+
+        resolve(text);
+    });
+}
+
 async function runTestBrowser(browser, testPath, options) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -899,8 +936,12 @@ async function runTestBrowser(browser, testPath, options) {
 
             const url = `http://localhost:${options.port}/run/${testPath}`;
             let results = {};
-            page.on('console', (msg) => {
-                results = handleMessage(msg._text, testPath, options);
+            page.on('console', async(msg) => {
+                const newMsg = await formatLog(msg);
+                const resp = handleMessage(newMsg, testPath, options);
+                if (resp) {
+                    results = resp;
+                }
             });
 
             page.on('response', async(response) => {
@@ -1072,6 +1113,11 @@ function logLogs(exitCode) {
 
     console.log(chalk.bold.underline.blue('Console Logs\n'));
     for (const log of logs) {
+        if (typeof log === 'object' && log.constructor.name === 'Array' && log[0] === puppeteerObjectText) {
+            console.log(log[1], log[2]);
+            continue;
+        }
+
         console.log(log);
     }
     console.log('');
@@ -1257,6 +1303,7 @@ function showUsage(message) {
     console.log('-x, --no-coverage    Disable code coverage');
     console.log('-t, --timeout        Maximum time in seconds to wait for async tests to complete (default: 5)');
     console.log('-p, --port           Port to run webserver on (default: 5862)');
+    console.log('-i, --inject         JavaScript file(s) to inject into the page');
     console.log('-h, --help           Show usage');
     console.log('-v, --verbose        Show verbose output when tests run');
     console.log('--version            Show version');
@@ -1276,6 +1323,7 @@ const argv = yargs
     .alias('x', 'no-coverage')
     .alias('p', 'port')
     .alias('t', 'timeout')
+    .alias('i', 'inject')
     .help('').argv;
 
 if (argv.help) {
@@ -1300,6 +1348,14 @@ if (paths.length === 0) {
     process.exit(1);
 }
 
+// yargv tries to be too smart and when you prefix a flag with --no-{flagName}
+// it automatically sets the result to {flagName}: false which was not what I
+// was expecting. This makes sure that if the flag is set to false the other
+// value comes in too.
+if (argv.coverage === false) {
+    argv.noCoverage = true;
+}
+
 const options = {
     paths,
     binary: argv.$0,
@@ -1308,6 +1364,7 @@ const options = {
     port: argv.port || 5862,
     verbose: argv.verbose,
     node: argv.node,
+    inject: argv.inject,
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail'],
     timeout: argv.timeout || 5
