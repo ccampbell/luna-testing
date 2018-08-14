@@ -23,6 +23,7 @@ function showUsage(message) {
     console.log('-x, --no-coverage    Disable code coverage');
     console.log('-t, --timeout        Maximum time in seconds to wait for async tests to complete (default: 5)');
     console.log('-p, --port           Port to run webserver on (default: 5862)');
+    console.log('-i, --inject         JavaScript file(s) to inject into the page');
     console.log('-h, --help           Show usage');
     console.log('-v, --verbose        Show verbose output when tests run');
     console.log('--version            Show version');
@@ -42,6 +43,7 @@ const argv = yargs
     .alias('x', 'no-coverage')
     .alias('p', 'port')
     .alias('t', 'timeout')
+    .alias('i', 'inject')
     .help('').argv;
 
 if (argv.help) {
@@ -82,6 +84,7 @@ const options = {
     port: argv.port || 5862,
     verbose: argv.verbose,
     node: argv.node,
+    inject: argv.inject,
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail'],
     timeout: argv.timeout || 5

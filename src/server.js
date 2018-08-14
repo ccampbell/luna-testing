@@ -83,7 +83,16 @@ async function bundleHandler(req, res) {
 function runHandler(req, res) {
     const filePath = req.params[0];
     const bundlePath = `/bundle/${filePath}`;
-    res.status(200).send(`<!DOCTYPE html><head><title>${filePath} – Test Runner</title></head><body><script src="${bundlePath}"></script></body>`);
+
+    let inject = '';
+    if (runOptions.inject) {
+        const extra = runOptions.inject.split(',');
+        for (const script of extra) {
+            inject += `<script src="/static/${script}"></script>`;
+        }
+    }
+
+    res.status(200).send(`<!DOCTYPE html><head><title>${filePath} – Test Runner</title></head><body>${inject}<script src="${bundlePath}"></script></body>`);
 }
 
 export async function startServer(options) {
@@ -92,6 +101,8 @@ export async function startServer(options) {
     const app = express();
     app.get(/\/bundle\/(.*)/, bundleHandler);
     app.get(/\/run\/(.*)/, runHandler);
+    app.use('/static', express.static(process.cwd()));
+
     return app.listen(options.port, () => {
         if (options.verbose) {
             console.log(`🔌  Server started at ${chalk.bold(`http://localhost:${options.port}`)}…`);

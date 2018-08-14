@@ -79,11 +79,21 @@ export async function resolveSourceMap(coverage, ignore) {
     //     text: "fileContents"
     // }]
     const newCoverage = [];
-    const sourceMapData = getSourceMapData(coverage);
+    let sourceMapData;
+    try {
+        sourceMapData = getSourceMapData(coverage);
+    } catch (e) {
+        return Promise.resolve(newCoverage);
+    }
 
     const remove = [];
     for (let i = 0; i < sourceMapData.sources.length; i++) {
         if (sourceMapData.sources[i].indexOf(ignore) > -1) {
+            remove.push(i);
+        }
+
+        // hardcoded static files
+        if (sourceMapData.sources[i].indexOf('/static/') > -1) {
             remove.push(i);
         }
 
