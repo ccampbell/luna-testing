@@ -23,7 +23,7 @@ function addToCoverage({ newCoverage, sources, code, range, consumer }) {
     const startData = consumer.originalPositionFor(start);
     const endData = consumer.originalPositionFor(end);
 
-    if (startData.source === endData.source) {
+    if (startData.source === endData.source && startData.source !== null) {
         addRangeToCoverage(newCoverage, sources, startData, endData);
         return;
     }

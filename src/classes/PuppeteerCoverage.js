@@ -54,9 +54,11 @@ export default class PuppeteerCoverage {
         return coverage1;
     }
 
-    _merge(coverage) {
-        for (const path in coverage) {
-            this._coverage[path] = this._mergeRanges(this._coverage[path], coverage[path]);
+    _merge(coverages) {
+        for (const path in coverages) {
+            const url = coverages[path].url;
+            const coverage = coverages[path];
+            this._coverage[url] = this._mergeRanges(this._coverage[url], coverage);
         }
     }
 
