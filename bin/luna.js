@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.1.0 */
+/* Luna v1.1.1 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -425,7 +425,7 @@ function addToCoverage({ newCoverage, sources, code, range, consumer }) {
     const startData = consumer.originalPositionFor(start);
     const endData = consumer.originalPositionFor(end);
 
-    if (startData.source === endData.source) {
+    if (startData.source === endData.source && startData.source !== null) {
         addRangeToCoverage(newCoverage, sources, startData, endData);
         return;
     }
@@ -721,9 +721,11 @@ class PuppeteerCoverage {
         return coverage1;
     }
 
-    _merge(coverage) {
-        for (const path in coverage) {
-            this._coverage[path] = this._mergeRanges(this._coverage[path], coverage[path]);
+    _merge(coverages) {
+        for (const path in coverages) {
+            const url = coverages[path].url;
+            const coverage = coverages[path];
+            this._coverage[url] = this._mergeRanges(this._coverage[url], coverage);
         }
     }
 
