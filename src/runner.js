@@ -167,7 +167,7 @@ async function formatLog(msg) {
             const objectData = msg._args[0]._remoteObject.preview;
             msg._args[0].jsonValue().then((val) => {
                 resolve([text, objectData.description, val]);
-            });
+            }).catch(() => {});
             return;
         }
 
