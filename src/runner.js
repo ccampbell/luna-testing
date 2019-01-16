@@ -202,13 +202,19 @@ async function runTestBrowser(browser, testPath, options) {
                     // error in a header
                     const headers = response.headers();
                     reject(JSON.parse(headers.error));
-                    await page.close();
                 }
             });
 
+            let hasError = false;
             page.on('pageerror', async(event) => {
-                reject(event);
-                await page.close();
+                if (hasError) {
+                    return;
+                }
+
+                hasError = true;
+                const code = await getBundle(testPath, options);
+                const newStack = await applySourceMapToTrace(event.message, [{ text: code }]);
+                reject(newStack);
             });
 
             await page.goto(url, { timeout: 5000 });
