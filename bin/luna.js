@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.1.2 */
+/* Luna v1.1.3 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -919,7 +919,7 @@ async function formatLog(msg) {
             const objectData = msg._args[0]._remoteObject.preview;
             msg._args[0].jsonValue().then((val) => {
                 resolve([text, objectData.description, val]);
-            });
+            }).catch(() => {});
             return;
         }
 
