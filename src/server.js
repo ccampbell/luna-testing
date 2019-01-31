@@ -45,12 +45,14 @@ export async function getBundle(filePath, options) {
                 plugins
             });
 
-            /* eslint-disable prefer-const */
-            let { code, map } = await bundle.generate({
+            const { output } = await bundle.generate({
                 format: options.node ? 'cjs' : 'iife',
                 freeze: true,
                 sourcemap: 'inline'
             });
+
+            /* eslint-disable prefer-const */
+            let { code, map } = output[0];
             /* eslint-enable prefer-const */
 
             code += `\n//# sourceMappingURL=${map.toUrl()}\n`;
