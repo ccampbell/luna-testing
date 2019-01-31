@@ -274,6 +274,7 @@ const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const coverage = require('rollup-plugin-istanbul');
+const svelte = require('rollup-plugin-svelte');
 
 let runOptions;
 
@@ -305,6 +306,14 @@ async function getBundle(filePath, options) {
                 }));
             }
 
+            if (options.svelte) {
+                plugins.unshift(svelte({
+                    include: options.svelte,
+                    dev: true,
+                    css: true
+                }));
+            }
+
             const bundle = await rollup.rollup({
                 input: path.resolve(`${__dirname}/../src`, options.node ? 'run-node.js' : 'run-browser.js'),
                 external: ['chalk'],
@@ -312,12 +321,14 @@ async function getBundle(filePath, options) {
                 plugins
             });
 
-            /* eslint-disable prefer-const */
-            let { code, map } = await bundle.generate({
+            const { output } = await bundle.generate({
                 format: options.node ? 'cjs' : 'iife',
                 freeze: true,
                 sourcemap: 'inline'
             });
+
+            /* eslint-disable prefer-const */
+            let { code, map } = output[0];
             /* eslint-enable prefer-const */
 
             code += `\n//# sourceMappingURL=${map.toUrl()}\n`;
@@ -1310,8 +1321,9 @@ function showUsage(message) {
     console.log('-f, --fast-fail      Fail immediately after a test failure');
     console.log('-x, --no-coverage    Disable code coverage');
     console.log('-t, --timeout        Maximum time in seconds to wait for async tests to complete (default: 5)');
-    console.log('-p, --port           Port to run webserver on (default: 5862)');
     console.log('-i, --inject         JavaScript file(s) to inject into the page');
+    console.log('-s, --svelte         Path or glob of svelte components to compile');
+    console.log('-p, --port           Port to run webserver on (default: 5862)');
     console.log('-h, --help           Show usage');
     console.log('-v, --verbose        Show verbose output when tests run');
     console.log('--version            Show version');
@@ -1332,6 +1344,7 @@ const argv = yargs
     .alias('p', 'port')
     .alias('t', 'timeout')
     .alias('i', 'inject')
+    .alias('s', 'svelte')
     .help('').argv;
 
 if (argv.help) {
@@ -1375,6 +1388,7 @@ const options = {
     inject: argv.inject,
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail'],
+    svelte: argv.svelte,
     timeout: argv.timeout || 5
 };
 
