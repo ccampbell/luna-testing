@@ -6,6 +6,7 @@ const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const coverage = require('rollup-plugin-istanbul');
 const svelte = require('rollup-plugin-svelte');
+const nodeResolve = require('rollup-plugin-node-resolve');
 import assert from './rollup-assert';
 import chalk from 'chalk';
 
@@ -24,6 +25,7 @@ export async function getBundle(filePath, options) {
                     TEST_FILE_PATH: fullTestPath,
                     TEST_TIMEOUT: options.timeout
                 }),
+                nodeResolve(),
                 buble({
                     target: {
                         chrome: 63
