@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.2.0 */
+/* Luna v1.3.0 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -275,6 +275,7 @@ const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const coverage = require('rollup-plugin-istanbul');
 const svelte = require('rollup-plugin-svelte');
+const nodeResolve = require('rollup-plugin-node-resolve');
 
 let runOptions;
 
@@ -291,6 +292,7 @@ async function getBundle(filePath, options) {
                     TEST_FILE_PATH: fullTestPath,
                     TEST_TIMEOUT: options.timeout
                 }),
+                nodeResolve(),
                 buble({
                     target: {
                         chrome: 63
