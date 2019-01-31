@@ -123,7 +123,7 @@ Luna makes some assumptions about how your projects and tests should be written.
 
     Tests execute by default in Chromium 68. That should support all ES2017 features. Newer versions of Node should also support these features natively. Luna requires Node version 7.6 or later.
 
-    **_Note:_** *There is one exception to this which is that JSX **will** be transpiled into `React.createElement` syntax automatically. This is to make it possible to test React projects.*
+    **_Note:_** *There are two exceptions to this. One is that JSX **will** be transpiled into `React.createElement` syntax automatically. This is to make it possible to test React projects. The other is that [svelte](https://svelte.technology/) components will compile if you set a [command line flag](#command-line-options).*
 
 - **Your tests will not be able to run in older browsers**
 
@@ -179,6 +179,7 @@ Even though Luna does not support any configuration options via a config file, i
 | <pre>`-x, --no-coverage`</pre> | No Coverage | Disables code coverage reporting. Could speed up test execution. | false |
 | <pre>`-t, --timeout`</pre> | Timeout | The amount of time in seconds to wait for asynchronous functions to complete | 5 |
 | <pre>`-i, --inject`</pre> | Inject | Local path to a script (or comma separated scripts) to inject into the page before the tests run. This is useful if you have a library that is not compatible with ES6 modules. The file path has to be within the current working directory and a relative path. This option is only applicable when running in browser mode. | null |
+| <pre>`-s, --svelte`</pre> | Svelte | A path or glob to use to compile [svelte](https://svelte.technology/) components at runtime. For example `src/components/**/*.html` would match all components in the src/components directory.  | null |
 | <pre>`-p, --port`</pre> | Port | The port to use for the webserver that is used to serve js files to the browser | 5862 |
 | <pre>`-h, --help`</pre> | Help | Shows help output | n/a |
 | <pre>`-v, --verbose`</pre> | Verbose | Show verbose output. This lists the result of each test as it completes. Verbose mode is triggered automatically when running from a continuous integration service such as travis. | false |

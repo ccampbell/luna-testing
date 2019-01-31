@@ -5,6 +5,7 @@ const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const coverage = require('rollup-plugin-istanbul');
+const svelte = require('rollup-plugin-svelte');
 import assert from './rollup-assert';
 import chalk from 'chalk';
 
@@ -35,6 +36,14 @@ export async function getBundle(filePath, options) {
             if (options.node && options.coverage) {
                 plugins.push(coverage({
                     exclude: [filePath, 'node_modules/**']
+                }));
+            }
+
+            if (options.svelte) {
+                plugins.unshift(svelte({
+                    include: options.svelte,
+                    dev: true,
+                    css: true
                 }));
             }
 
