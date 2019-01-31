@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.1.3 */
+/* Luna v1.2.0 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
