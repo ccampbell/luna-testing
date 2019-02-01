@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.3.0 */
+/* Luna v1.3.1 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -432,51 +432,73 @@ function addRangeToCoverage(newCoverage, sources, start, end) {
 function addToCoverage({ newCoverage, sources, code, range, consumer }) {
     const start = findLineAndColumnForPosition(code, range.start);
     const end = findLineAndColumnForPosition(code, range.end);
-    start.bias = sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND;
-    end.bias = sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND;
 
-    const startData = consumer.originalPositionFor(start);
-    const endData = consumer.originalPositionFor(end);
+    const currentPosition = start;
+    currentPosition.bias = sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND;
 
-    if (startData.source === endData.source && startData.source !== null) {
-        addRangeToCoverage(newCoverage, sources, startData, endData);
-        return;
-    }
-
-    const newRanges = [];
-    const start2 = start;
-    while (start2.line <= end.line) {
-        const newData = consumer.originalPositionFor(start2);
-        start2.line += 1;
-        start2.column = 0;
-        if (start2.line === end.line) {
-            start2.column = end.column;
+    let lastSource = null;
+    let currentData = null;
+    let lastData = null;
+    let newStart;
+    let newEnd;
+    while (currentPosition.line <= end.line) {
+        // Keep the position for the first iteration and moving forward add a
+        // line at a time
+        if (currentData !== null) {
+            currentPosition.line++;
+            currentPosition.column = 0;
         }
 
-        const lastSource = newRanges.length === 0 ? null : newRanges[newRanges.length - 1][0].source;
-        if (newData.source === null) {
+        const isEnd = currentPosition.line === end.line;
+        if (isEnd) {
+            currentPosition.column = end.column;
+        }
+
+        currentData = consumer.originalPositionFor(currentPosition);
+        const hasSource = currentData.source !== null;
+
+        // If this is the end then add the range and return
+        if (isEnd && newStart) {
+            newEnd = hasSource ? currentData : lastData;
+            addRangeToCoverage(newCoverage, sources, newStart, newEnd);
+            return;
+        }
+
+        if (!hasSource) {
             continue;
         }
 
-        if (newData.source !== lastSource) {
-            if (newRanges.length && newRanges[newRanges.length - 1][1] === null) {
-                newRanges[newRanges.length - 1][1] = newRanges[newRanges.length - 1][0];
+        // Situations where we want to start a new range and push this one onto
+        // the stack
+        const isNewSource = currentData.source !== lastSource && currentData.source !== null;
+        const isBigLineJump = !isNewSource && lastData && (currentData.line - lastData.line > 2);
+        const isNegativeLineJump = !isNewSource && lastData && currentData.line < lastData.line;
+        if (isNewSource || isBigLineJump || isNegativeLineJump) {
+            lastSource = currentData.source;
+
+            // If we haven’t started a range then we should set this position
+            // to the start of the range and continue on in the loop
+            if (!newStart) {
+                newStart = currentData;
+                lastData = currentData;
+                continue;
             }
 
-            newRanges.push([newData, null]);
-            continue;
+            // Otherwise we should use the previous data to mark the end of the
+            // last range and start a new range where we are
+            newEnd = lastData;
+            addRangeToCoverage(newCoverage, sources, newStart, newEnd);
+
+            newStart = currentData;
+            newEnd = null;
         }
 
-        newRanges[newRanges.length - 1][1] = newData;
-    }
-
-    for (const newRange of newRanges) {
-        addRangeToCoverage(newCoverage, sources, newRange[0], newRange[1]);
+        lastData = currentData;
     }
 }
 
 function getSourceMapData(coverage) {
-    const [, sourceMapString] = coverage.text.split('# sourceMappingURL=data:application/json;charset=utf-8;base64,');
+    const sourceMapString = coverage.text.split('# sourceMappingURL=data:application/json;charset=utf-8;base64,').pop();
     const buf = Buffer.from(sourceMapString, 'base64');
     return JSON.parse(buf.toString());
 }
@@ -512,7 +534,7 @@ async function resolveSourceMap(coverage, ignore) {
             remove.push(i);
         }
 
-        if (sourceMapData.sources[i].indexOf('/node_modules/') > -1) {
+        if (sourceMapData.sources[i].indexOf('node_modules/') > -1) {
             remove.push(i);
         }
 
