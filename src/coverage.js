@@ -61,7 +61,7 @@ function addToCoverage({ newCoverage, sources, code, range, consumer }) {
 }
 
 function getSourceMapData(coverage) {
-    const [, sourceMapString] = coverage.text.split('# sourceMappingURL=data:application/json;charset=utf-8;base64,');
+    const sourceMapString = coverage.text.split('# sourceMappingURL=data:application/json;charset=utf-8;base64,').pop();
     const buf = Buffer.from(sourceMapString, 'base64');
     return JSON.parse(buf.toString());
 }
