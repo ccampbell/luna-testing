@@ -119,7 +119,7 @@ export async function resolveSourceMap(coverage, ignore) {
             remove.push(i);
         }
 
-        if (sourceMapData.sources[i].indexOf('/node_modules/') > -1) {
+        if (sourceMapData.sources[i].indexOf('node_modules/') > -1) {
             remove.push(i);
         }
 
