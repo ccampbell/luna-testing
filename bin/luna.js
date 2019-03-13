@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.3.1 */
+/* Luna v1.3.2 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -1004,7 +1004,7 @@ async function runTestBrowser(browser, testPath, options) {
                 reject(newStack);
             });
 
-            await page.goto(url, { timeout: 5000 });
+            await page.goto(url);
             await page.waitForSelector('.done');
 
             let jsCoverage;
