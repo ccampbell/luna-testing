@@ -217,7 +217,7 @@ async function runTestBrowser(browser, testPath, options) {
                 reject(newStack);
             });
 
-            await page.goto(url, { timeout: 5000 });
+            await page.goto(url);
             await page.waitForSelector('.done');
 
             let jsCoverage;
