@@ -1,5 +1,5 @@
 test/
 coverage/
 .eslintrc
-luna.sublime-workspace
-luna.sublime-project
+luna-testing.sublime-workspace
+luna-testing.sublime-project
