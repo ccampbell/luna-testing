@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.3.2 */
+/* Luna v1.4.0 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -905,8 +905,8 @@ function handleMessage(message, testPath, options) {
     return false;
 }
 
-function groupLines(string$$1) {
-    const bits = string$$1.split(new RegExp(`^${PREFIX.results}`, 'gm'));
+function groupLines(string) {
+    const bits = string.split(new RegExp(`^${PREFIX.results}`, 'gm'));
     const lines = bits[0].split('\n');
     if (bits[1]) {
         lines.push(`${PREFIX.results} ${bits[1]}`);
