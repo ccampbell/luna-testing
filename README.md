@@ -179,6 +179,7 @@ Even though Luna does not support any configuration options via a config file, i
 | <pre>`-x, --no-coverage`</pre> | No Coverage | Disables code coverage reporting. Could speed up test execution. | false |
 | <pre>`-t, --timeout`</pre> | Timeout | The amount of time in seconds to wait for asynchronous functions to complete | 5 |
 | <pre>`-i, --inject`</pre> | Inject | Local path to a script (or comma separated scripts) to inject into the page before the tests run. This is useful if you have a library that is not compatible with ES6 modules. The file path has to be within the current working directory and a relative path. This option is only applicable when running in browser mode. | null |
+| <pre>`-d, --debug`</pre> | Debug | Sets debug mode to true. This option will keep the test server running after the tests have completed to allow manual debugging in a browser. It will also print the test URLs to the command line output. | false |
 | <pre>`-s, --svelte`</pre> | Svelte | A path or glob to use to compile [svelte](https://svelte.technology/) components at runtime. For example `src/components/**/*.html` would match all components in the src/components directory.  | null |
 | <pre>`-p, --port`</pre> | Port | The port to use for the webserver that is used to serve js files to the browser | 5862 |
 | <pre>`-h, --help`</pre> | Help | Shows help output | n/a |
