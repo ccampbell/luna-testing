@@ -12,7 +12,7 @@
     "test_browser": "bin/luna.js test/test-luna.js -x",
     "test": "bin/luna.js test -n",
     "build": "rollup src/luna.js -e magic-string,progress,chalk -o bin/luna.js -f cjs --banner \"#!/usr/bin/env node\n/* Luna v$npm_package_version */\"",
-    "lint": "eslint src",
+    "lint": "eslint -c .eslintrc src",
     "preversion": "npm test",
     "version": "npm run build && git add bin/luna.js"
   },
