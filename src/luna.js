@@ -91,7 +91,7 @@ const options = {
     inject: argv.inject,
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail'],
-    debug: argv['debug'],
+    debug: argv.debug,
     svelte: argv.svelte,
     timeout: argv.timeout || 5
 };
