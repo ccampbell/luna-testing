@@ -62,7 +62,7 @@ export default class Luna {
             }
         }
 
-        if (assertion.value === false) {
+        if (!assertion.value) {
             this._fail(message, assertion);
         }
     }
