@@ -23,6 +23,7 @@ function showUsage(message) {
     console.log('-x, --no-coverage    Disable code coverage');
     console.log('-t, --timeout        Maximum time in seconds to wait for async tests to complete (default: 5)');
     console.log('-i, --inject         JavaScript file(s) to inject into the page');
+    console.log('-d, --debug          Keep the test server running for debugging purposes');
     console.log('-s, --svelte         Path or glob of svelte components to compile');
     console.log('-p, --port           Port to run webserver on (default: 5862)');
     console.log('-h, --help           Show usage');
@@ -45,6 +46,7 @@ const argv = yargs
     .alias('p', 'port')
     .alias('t', 'timeout')
     .alias('i', 'inject')
+    .alias('d', 'debug')
     .alias('s', 'svelte')
     .help('').argv;
 
@@ -89,6 +91,7 @@ const options = {
     inject: argv.inject,
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail'],
+    debug: argv['debug'],
     svelte: argv.svelte,
     timeout: argv.timeout || 5
 };

@@ -185,6 +185,11 @@ async function runTestBrowser(browser, testPath, options) {
             }
 
             const url = `http://localhost:${options.port}/run/${testPath}`;
+
+            if (options.debug) {
+                console.log(`🔗  Opening URL: ${url}`);
+            }
+
             let results = {};
             page.on('console', async(msg) => {
                 const newMsg = await formatLog(msg);
@@ -497,8 +502,17 @@ export async function runTests(options) {
 
         console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
 
+        // We can always close the browser
         if (!options.node) {
             await browser.close();
+        }
+
+        if (options.debug) {
+            // In debug mode we want to keep the server running
+            return;
+        }
+
+        if (!options.node) {
             await server.close();
         }
 
