@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.4.0 */
+/* Luna v1.5.0 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -972,6 +972,11 @@ async function runTestBrowser(browser, testPath, options) {
             }
 
             const url = `http://localhost:${options.port}/run/${testPath}`;
+
+            if (options.debug) {
+                console.log(`🔗  Opening URL: ${url}`);
+            }
+
             let results = {};
             page.on('console', async(msg) => {
                 const newMsg = await formatLog(msg);
@@ -1284,8 +1289,17 @@ async function runTests(options) {
 
         console.log(`⚡️  Took ${getElapsedTime(startTime, endTime)}`);
 
+        // We can always close the browser
         if (!options.node) {
             await browser.close();
+        }
+
+        if (options.debug) {
+            // In debug mode we want to keep the server running
+            return;
+        }
+
+        if (!options.node) {
             await server.close();
         }
 
@@ -1346,6 +1360,7 @@ function showUsage(message) {
     console.log('-x, --no-coverage    Disable code coverage');
     console.log('-t, --timeout        Maximum time in seconds to wait for async tests to complete (default: 5)');
     console.log('-i, --inject         JavaScript file(s) to inject into the page');
+    console.log('-d, --debug          Keep the test server running for debugging purposes');
     console.log('-s, --svelte         Path or glob of svelte components to compile');
     console.log('-p, --port           Port to run webserver on (default: 5862)');
     console.log('-h, --help           Show usage');
@@ -1368,6 +1383,7 @@ const argv = yargs
     .alias('p', 'port')
     .alias('t', 'timeout')
     .alias('i', 'inject')
+    .alias('d', 'debug')
     .alias('s', 'svelte')
     .help('').argv;
 
@@ -1412,6 +1428,7 @@ const options = {
     inject: argv.inject,
     singleRun: argv['single-run'],
     fastFail: argv['fast-fail'],
+    debug: argv.debug,
     svelte: argv.svelte,
     timeout: argv.timeout || 5
 };
