@@ -28,7 +28,7 @@ export async function getBundle(filePath, options) {
                 nodeResolve(),
                 buble({
                     target: {
-                        chrome: 63
+                        chrome: 71
                     },
                     jsx: 'React.createElement'
                 }),
