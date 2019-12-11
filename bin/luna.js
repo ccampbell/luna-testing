@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.5.0 */
+/* Luna v1.5.1 */
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -295,7 +295,7 @@ async function getBundle(filePath, options) {
                 nodeResolve(),
                 buble({
                     target: {
-                        chrome: 63
+                        chrome: 71
                     },
                     jsx: 'React.createElement'
                 }),
