@@ -185,6 +185,8 @@ Even though Luna does not support any configuration options via a config file, i
 | <pre>`-h, --help`</pre> | Help | Shows help output | n/a |
 | <pre>`-v, --verbose`</pre> | Verbose | Show verbose output. This lists the result of each test as it completes. Verbose mode is triggered automatically when running from a continuous integration service such as travis. | false |
 
+**_Note_** *As of version 1.6.0 Svelte components have to be version 3 components. If you need support for Svelte 2.x you have to use version 1.5.1 and below*
+
 ## Defining tests
 
 Since tests are nothing more than exported functions you can define your tests anywhere. You could even define tests directly in your source code. For example in `src/util.js`:
