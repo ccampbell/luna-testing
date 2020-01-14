@@ -7,18 +7,17 @@ async function tick() {
 }
 
 export async function testComponent(t) {
-    const wrapper = document.createElement('div');
-    wrapper.classList.add('wrapper');
-    document.body.appendChild(wrapper);
+    const target = document.createElement('div');
+    document.body.appendChild(target);
 
     const c = new Test({
-        target: wrapper,
+        target,
         props: {}
     });
 
-    t.assert(wrapper.innerHTML === '<h1>Hello world!</h1>');
+    t.assert(target.innerHTML === '<h1>Hello world!</h1>');
 
     c.$set({ name: 'Luna' });
     await tick();
-    t.assert(wrapper.innerHTML === '<h1>Hello Luna!</h1>');
+    t.assert(target.innerHTML === '<h1>Hello Luna!</h1>');
 }
