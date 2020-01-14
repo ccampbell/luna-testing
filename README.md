@@ -121,7 +121,7 @@ Luna makes some assumptions about how your projects and tests should be written.
 
     Luna uses rollup to resolve the modules and bundle your tests into standalone JavaScript files to run. Unlike other testing frameworks where you have to juggle around a bunch of .babelrc files and configurations, or try out experimental node libraries, Luna does not touch your source code. It keeps everything as ES2017 JavaScript. This means it will **not** work with CoffeeScript or TypeScript or other compile to JavaScript languages out of the box.
 
-    Tests execute by default in Chromium 72. That should support all ES2017 features. Newer versions of Node should also support these features natively. Luna requires Node version 7.6 or later.
+    Tests execute by default in Chromium 79. That should support all ES2017 features. Newer versions of Node should also support these features natively. Luna requires Node version 7.6 or later.
 
     **_Note:_** *There are two exceptions to this. One is that JSX **will** be transpiled into `React.createElement` syntax automatically. This is to make it possible to test React projects. The other is that [svelte](https://svelte.technology/) components will compile if you set a [command line flag](#command-line-options).*
 
