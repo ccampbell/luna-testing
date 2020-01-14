@@ -205,7 +205,7 @@ Now when you run `luna src` or `luna src/util.js`, it will find this test and ru
 
 ### Asynchronous tests
 
-In addition to regular test functions, Luna also supports tests that run asynchronously. Rather than try to force any magical syntax on you, to run an asynchronous function all you have to do is define the function as `async` and make sure it returns a promise:
+In addition to regular test functions, Luna also supports tests that run asynchronously. Rather than try to force any magical syntax on you, to run an asynchronous function all you have to do is define the function as `async`:
 
 ```javascript
 export async function testAsyncCode(t) {
@@ -219,7 +219,7 @@ export async function testAsyncCode(t) {
 }
 ```
 
-As soon as the promise resolves, the test is considered to have completed. If you reject, it will be considered an error instead of a failure. There is also a configurable timeout. If the test does not finish in a certain amount of time (default is five seconds), it will be marked as an error.
+As soon as the function executes, the test is considered to have completed. If you have to execute code that does not use `async`/`await` then you can wrap it in a promise as shown here. If you reject the promise, it will be considered an error instead of a failure. There is also a configurable timeout. If the test does not finish in a certain amount of time (default is five seconds), it will be marked as an error.
 
 ### Skipping tests
 
