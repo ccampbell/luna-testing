@@ -44,8 +44,11 @@ export async function getBundle(filePath, options) {
             if (options.svelte) {
                 plugins.unshift(svelte({
                     include: options.svelte,
-                    dev: true,
-                    css: true
+                    emitCss: false,
+                    compilerOptions: {
+                        css: true,
+                        dev: true
+                    }
                 }));
             }
 
