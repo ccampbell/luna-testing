@@ -160,21 +160,6 @@ async function runTestNode(testPath, options) {
     });
 }
 
-async function formatLog(msg) {
-    return new Promise((resolve, reject) => {
-        const text = msg._text;
-        if (text === puppeteerObjectText) {
-            const objectData = msg._args[0]._remoteObject.preview;
-            msg._args[0].jsonValue().then((val) => {
-                resolve([text, objectData.description, val]);
-            }).catch(() => {});
-            return;
-        }
-
-        resolve(text);
-    });
-}
-
 async function runTestBrowser(browser, testPath, options) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -192,7 +177,7 @@ async function runTestBrowser(browser, testPath, options) {
 
             let results = {};
             page.on('console', async(msg) => {
-                const newMsg = await formatLog(msg);
+                const newMsg = msg.text();
                 const resp = handleMessage(newMsg, testPath, options);
                 if (resp) {
                     results = resp;
