@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Luna v1.7.0 */
+/* Luna v1.8.0 */
 'use strict';
 
 var chalk = require('chalk');
