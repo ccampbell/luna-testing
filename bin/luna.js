@@ -391,7 +391,7 @@ async function startServer(options) {
 
     return app.listen(options.port, () => {
         if (options.verbose) {
-            console.log(`🔌  Server started at ${chalk__default['default'].bold(`http://localhost:${options.port}`)}…`);
+            console.log(`🔌  Server started at ${chalk__default["default"].bold(`http://localhost:${options.port}`)}…`);
         }
     });
 }
@@ -401,7 +401,7 @@ function syntaxHighlight(code) {
     const stringMap = {};
 
     if (code === undefined) {
-        return chalk__default['default'].yellow('undefined');
+        return chalk__default["default"].yellow('undefined');
     }
 
     code = code.replace(string, (match) => {
@@ -411,11 +411,11 @@ function syntaxHighlight(code) {
         return stringName;
     });
 
-    code = code.replace(operator, (match) => chalk__default['default'].magenta(match));
-    code = code.replace(constant, (match) => chalk__default['default'].yellow(match));
+    code = code.replace(operator, (match) => chalk__default["default"].magenta(match));
+    code = code.replace(constant, (match) => chalk__default["default"].yellow(match));
 
     for (const stringName of strings) {
-        code = code.replace(stringName, chalk__default['default'].green(stringMap[stringName]));
+        code = code.replace(stringName, chalk__default["default"].green(stringMap[stringName]));
     }
 
     return code;
@@ -890,7 +890,7 @@ function handleMessage(message, testPath, options) {
 
         const messageBits = message.split(' ');
         const failures = parseInt(messageBits[2], 10);
-        console.log(`${failures === 0 ? chalk__default['default'].green.bold('✔︎') : chalk__default['default'].red.bold('𝗫')}  ${chalk__default['default'].gray(`[${testPath}]`)}`, messageBits[1]);
+        console.log(`${failures === 0 ? chalk__default["default"].green.bold('✔︎') : chalk__default["default"].red.bold('𝗫')}  ${chalk__default["default"].gray(`[${testPath}]`)}`, messageBits[1]);
         return false;
     }
 
@@ -953,21 +953,6 @@ async function runTestNode(testPath, options) {
     });
 }
 
-async function formatLog(msg) {
-    return new Promise((resolve, reject) => {
-        const text = msg._text;
-        if (text === puppeteerObjectText) {
-            const objectData = msg._args[0]._remoteObject.preview;
-            msg._args[0].jsonValue().then((val) => {
-                resolve([text, objectData.description, val]);
-            }).catch(() => {});
-            return;
-        }
-
-        resolve(text);
-    });
-}
-
 async function runTestBrowser(browser, testPath, options) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -985,7 +970,7 @@ async function runTestBrowser(browser, testPath, options) {
 
             let results = {};
             page.on('console', async(msg) => {
-                const newMsg = await formatLog(msg);
+                const newMsg = msg.text();
                 const resp = handleMessage(newMsg, testPath, options);
                 if (resp) {
                     results = resp;
@@ -1049,7 +1034,7 @@ async function runTestBrowser(browser, testPath, options) {
 
 function killWithError(message) {
     if (message) {
-        console.log(`⚠️  ${chalk__default['default'].bold(message)}`);
+        console.log(`⚠️  ${chalk__default["default"].bold(message)}`);
     }
     process.exit(1);
 }
@@ -1059,8 +1044,8 @@ function logAssertion(testData) {
     const lineWidth = (lineNumber + 2).toString().length;
 
     const indent = spaces(4);
-    console.log(`\n${chalk__default['default'].yellow(formatLine(lineNumber - 1, lineWidth))}`);
-    console.log(`${chalk__default['default'].yellow(formatLine(lineNumber, lineWidth))} ${indent}${syntaxHighlight(testData.source.code)}`);
+    console.log(`\n${chalk__default["default"].yellow(formatLine(lineNumber - 1, lineWidth))}`);
+    console.log(`${chalk__default["default"].yellow(formatLine(lineNumber, lineWidth))} ${indent}${syntaxHighlight(testData.source.code)}`);
     let leftIndex = testData.left.range[0];
 
     // Move it to after the last dot
@@ -1079,21 +1064,21 @@ function logAssertion(testData) {
     }
 
     if (leftIndex > -1) {
-        console.log(`${chalk__default['default'].yellow(formatLine(lineNumber + 1, lineWidth))} ${indent}${spaces(leftIndex)}${chalk__default['default'].gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + chalk__default['default'].gray('|') : ''}`);
+        console.log(`${chalk__default["default"].yellow(formatLine(lineNumber + 1, lineWidth))} ${indent}${spaces(leftIndex)}${chalk__default["default"].gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + chalk__default["default"].gray('|') : ''}`);
         if (rightIndex > -1) {
-            console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${chalk__default['default'].gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + syntaxHighlight(JSON.stringify(testData.right.value)) : ''}`);
+            console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${chalk__default["default"].gray('|')}${rightIndex > -1 ? spaces(rightIndex - leftIndex - 1) + syntaxHighlight(JSON.stringify(testData.right.value)) : ''}`);
         }
         console.log(`${spaces(lineWidth)} ${indent}${spaces(leftIndex)}${syntaxHighlight(JSON.stringify(testData.left.value))}\n`);
     }
 }
 
 function logError(error, options) {
-    console.log(`\n${chalk__default['default'].bold.underline(error.name)}\n`);
+    console.log(`\n${chalk__default["default"].bold.underline(error.name)}\n`);
     if (error.type === 'taskerror') {
-        console.log(`⚠️  ${chalk__default['default'].red(error.data)}\n`);
+        console.log(`⚠️  ${chalk__default["default"].red(error.data)}\n`);
 
         if (!options.node) {
-            console.log(`❓  Perhaps you meant to run your tests in node using the ${chalk__default['default'].bold('--node')} flag\n`);
+            console.log(`❓  Perhaps you meant to run your tests in node using the ${chalk__default["default"].bold('--node')} flag\n`);
         }
         return;
     }
@@ -1103,7 +1088,7 @@ function logError(error, options) {
             continue;
         }
 
-        console.log(`❌  ${chalk__default['default'].red.bold(test.name)}`);
+        console.log(`❌  ${chalk__default["default"].red.bold(test.name)}`);
         if (test.data) {
             logAssertion(test.data);
             continue;
@@ -1165,7 +1150,7 @@ function logLogs(exitCode) {
         console.log('');
     }
 
-    console.log(chalk__default['default'].bold.underline.blue('Console Logs\n'));
+    console.log(chalk__default["default"].bold.underline.blue('Console Logs\n'));
     for (const log of logs) {
         if (typeof log === 'object' && log.constructor.name === 'Array' && log[0] === puppeteerObjectText) {
             console.log(log[1], log[2]);
@@ -1217,7 +1202,7 @@ function logCoverage(options) {
     reporter.addAll(reportersToUse);
     reporter.write(map);
 
-    console.log(`\n💾  HTML coverage report available at ${chalk__default['default'].bold.underline('coverage/lcov-report/index.html')}`);
+    console.log(`\n💾  HTML coverage report available at ${chalk__default["default"].bold.underline('coverage/lcov-report/index.html')}`);
 }
 
 async function runTests(options) {
@@ -1246,7 +1231,7 @@ async function runTests(options) {
 
     console.log('🌙  Running tests…');
     if (!options.verbose) {
-        bar = new ProgressBar__default['default']('⏳  [:bar] :percent (:current/:total)', {
+        bar = new ProgressBar__default["default"]('⏳  [:bar] :percent (:current/:total)', {
             total: totalTests,
             width: 50,
             renderThrottle: 0,
@@ -1374,7 +1359,7 @@ function showUsage(message) {
     console.log('--version            Show version');
 
     if (message) {
-        console.log(`\n⚠️  ${chalk__default['default'].bold(message)}`);
+        console.log(`\n⚠️  ${chalk__default["default"].bold(message)}`);
     }
 }
 
